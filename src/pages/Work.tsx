@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
+import { GradientButton } from "@/components/ui/gradient-button";
 import { Section, SectionHeader, Reveal, StaggerContainer, StaggerItem } from "@/components/ui/Section";
 import { DemoCard } from "@/components/ui/Cards";
 import { ArrowRight } from "lucide-react";
@@ -94,12 +95,10 @@ export default function Work() {
             </p>
           </Reveal>
           <Reveal delay={0.2}>
-            <Button variant="hero" size="lg" asChild>
-              <Link to="/contact">
-                Request a Quote
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-            </Button>
+            <GradientButton to="/contact">
+              Request a Quote
+              <ArrowRight className="w-5 h-5" />
+            </GradientButton>
           </Reveal>
         </div>
       </Section>

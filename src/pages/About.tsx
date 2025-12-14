@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
+import { GradientButton } from "@/components/ui/gradient-button";
 import { Section, Reveal } from "@/components/ui/Section";
 import { ArrowRight, Target, Zap, Shield, Users } from "lucide-react";
 
@@ -36,7 +37,7 @@ export default function About() {
           <div className="max-w-3xl">
             <Reveal>
               <span className="inline-block text-primary text-sm font-semibold uppercase tracking-wider mb-4">
-                About HxY
+                About HYRX
               </span>
             </Reveal>
             <Reveal delay={0.1}>
@@ -47,7 +48,7 @@ export default function About() {
             </Reveal>
             <Reveal delay={0.2}>
               <p className="text-body-lg">
-                HxY Services is a premium technology studio specializing in 3D/AR experiences and AI systems. We partner with innovative companies worldwide to build production-ready solutions that drive real business outcomes.
+                HYRX is a premium technology studio specializing in 3D/AR experiences and AI systems. We partner with innovative companies worldwide to build production-ready solutions that drive real business outcomes.
               </p>
             </Reveal>
           </div>
@@ -132,13 +133,11 @@ export default function About() {
             </p>
           </Reveal>
           <Reveal delay={0.2}>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Button variant="hero" size="lg" asChild>
-                <Link to="/contact">
-                  Request a Quote
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-              </Button>
+            <div className="flex flex-wrap justify-center items-center gap-4">
+              <GradientButton to="/contact">
+                Request a Quote
+                <ArrowRight className="w-5 h-5" />
+              </GradientButton>
               <Button variant="hero-outline" size="lg" asChild>
                 <Link to="/services">View Services</Link>
               </Button>

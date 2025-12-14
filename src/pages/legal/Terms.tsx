@@ -27,7 +27,7 @@ export default function Terms() {
           <Reveal>
             <h2>1. Services</h2>
             <p>
-              HxY Services provides 3D modelling, AR development, and AI solutions. The specific scope of work for each project is defined in individual project agreements.
+              HYRX provides 3D modelling, AR development, and AI solutions. The specific scope of work for each project is defined in individual project agreements.
             </p>
           </Reveal>
 

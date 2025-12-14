@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Box, Eye, Smartphone, Gauge, FileCheck, Check } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
+import { GradientButton } from "@/components/ui/gradient-button";
 import { Section, SectionHeader, Reveal, StaggerContainer, StaggerItem } from "@/components/ui/Section";
 import { FeatureCard } from "@/components/ui/Cards";
 
@@ -152,12 +153,10 @@ export default function Service3DAR() {
             </p>
           </Reveal>
           <Reveal delay={0.2}>
-            <Button variant="hero" size="lg" asChild>
-              <Link to="/contact">
-                Request a Quote
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-            </Button>
+            <GradientButton to="/contact">
+              Request a Quote
+              <ArrowRight className="w-5 h-5" />
+            </GradientButton>
           </Reveal>
         </div>
       </Section>

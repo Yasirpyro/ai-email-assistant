@@ -4,7 +4,29 @@
 @tailwind components;
 @tailwind utilities;
 
-/* HxY Services Design System - Hard-tech SaaS Dark Theme */
+/* Lenis smooth scroll base styles */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* HYRX Design System - Hard-tech SaaS Dark Theme */
 
 @layer base {
   :root {
@@ -226,6 +248,97 @@
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
   }
+
+  /* Rotating gradient for GradientButton */
+  @keyframes rotating-gradient {
+    0% {
+      --gradient-angle: 0deg;
+    }
+    100% {
+      --gradient-angle: 360deg;
+    }
+  }
+
+  /* Fallback animation for browsers without @property support */
+  @keyframes rotating-gradient-fallback {
+    0% {
+      background: conic-gradient(
+        from 0deg,
+        hsl(var(--primary)),
+        hsl(var(--accent)),
+        hsl(280 100% 60%),
+        hsl(var(--primary))
+      );
+    }
+    25% {
+      background: conic-gradient(
+        from 90deg,
+        hsl(var(--primary)),
+        hsl(var(--accent)),
+        hsl(280 100% 60%),
+        hsl(var(--primary))
+      );
+    }
+    50% {
+      background: conic-gradient(
+        from 180deg,
+        hsl(var(--primary)),
+        hsl(var(--accent)),
+        hsl(280 100% 60%),
+        hsl(var(--primary))
+      );
+    }
+    75% {
+      background: conic-gradient(
+        from 270deg,
+        hsl(var(--primary)),
+        hsl(var(--accent)),
+        hsl(280 100% 60%),
+        hsl(var(--primary))
+      );
+    }
+    100% {
+      background: conic-gradient(
+        from 360deg,
+        hsl(var(--primary)),
+        hsl(var(--accent)),
+        hsl(280 100% 60%),
+        hsl(var(--primary))
+      );
+    }
+  }
+
+  @property --gradient-angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+  }
+
+  .rotating-gradient-btn {
+    /* Fallback for browsers without @property support (Firefox, older Edge) */
+    background: conic-gradient(
+      from 0deg,
+      hsl(var(--primary)),
+      hsl(var(--accent)),
+      hsl(280 100% 60%),
+      hsl(var(--primary))
+    );
+    animation: rotating-gradient-fallback 3s linear infinite;
+  }
+
+  /* Progressive enhancement for browsers with @property support */
+  @supports (background: conic-gradient(from var(--gradient-angle), red, blue)) {
+    .rotating-gradient-btn {
+      background: conic-gradient(
+        from var(--gradient-angle),
+        hsl(var(--primary)),
+        hsl(var(--accent)),
+        hsl(280 100% 60%),
+        hsl(var(--primary))
+      );
+      animation: rotating-gradient 3s linear infinite;
+    }
+  }
   
   .animate-gradient {
     animation: gradient 6s ease infinite;
@@ -242,6 +355,44 @@
   .animate-shimmer {
     animation: shimmer 2s linear infinite;
     background-size: 200% 100%;
+  }
+
+  /* Hero Spline: fill container, keep robot on the right */
+  .hero-spline-canvas canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+    transform-origin: 100% 50%;
+    transform: translateX(2%);
+  }
+
+  .hero-spline-fallback {
+    transform-origin: 100% 50%;
+    transform: translateX(2%);
+  }
+
+  /* Glowing radial light behind Spline model */
+  .hero-spline-glow {
+    background: radial-gradient(
+      ellipse 55% 60% at 75% 50%,
+      hsla(249, 100%, 60%, 0.35) 0%,
+      hsla(249, 100%, 50%, 0.18) 30%,
+      hsla(264, 93%, 35%, 0.08) 55%,
+      transparent 75%
+    );
+    filter: blur(40px);
+    animation: spline-glow-pulse 6s ease-in-out infinite;
+  }
+
+  @keyframes spline-glow-pulse {
+    0%, 100% {
+      opacity: 0.85;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.04);
+    }
   }
   
   /* Reduced motion */

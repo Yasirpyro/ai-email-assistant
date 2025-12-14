@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { GradientButton } from "@/components/ui/gradient-button";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
@@ -18,9 +19,7 @@ export function SiteHeader() {
   const location = useLocation();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -29,27 +28,46 @@ export function SiteHeader() {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
 
+  // Forward header mouse move to Spline only on homepage
+  const handleHeaderMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    if (location.pathname !== "/") return;
+    const canvas = window.__heroSplineCanvas;
+    if (!canvas) return;
+
+    const evt = new MouseEvent("mousemove", {
+      bubbles: true,
+      cancelable: true,
+      clientX: e.clientX,
+      clientY: e.clientY,
+    });
+
+    canvas.dispatchEvent(evt);
+  };
+
   return (
     <header
+      onMouseMove={handleHeaderMouseMove}
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        isScrolled
-          ? "glass-strong py-3 shadow-lg shadow-background/50"
-          : "bg-transparent py-5"
+        isScrolled ? "glass-strong py-3 shadow-lg shadow-background/50" : "bg-transparent py-5"
       )}
     >
       <nav className="container-main flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 group">
-          <div className="relative">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center font-bold text-primary-foreground text-lg transition-transform group-hover:scale-105">
-              Hx
-            </div>
-            <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-primary to-accent blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
+        <Link to="/" className="flex items-center gap-3 cursor-pointer">
+          <img
+            src="/brandlogo.png"
+            alt="HYRX Logo"
+            className="w-10 h-10 rounded-lg object-contain"
+          />
+          <div className="flex flex-col">
+            <span className="text-xl font-bold text-foreground leading-tight">
+              HYRX
+            </span>
+            <span className="text-[10px] font-light text-foreground/70 tracking-[0.2em] uppercase leading-tight">
+              AI studio
+            </span>
           </div>
-          <span className="text-xl font-bold text-foreground">
-            HxY<span className="text-muted-foreground font-normal"> Services</span>
-          </span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -59,10 +77,10 @@ export function SiteHeader() {
               key={link.href}
               to={link.href}
               className={cn(
-                "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                "px-4 py-2 text-sm font-medium transition-colors duration-200 outline-none focus:outline-none focus-visible:outline-none",
                 location.pathname === link.href || location.pathname.startsWith(link.href + "/")
-                  ? "text-primary bg-primary/10"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  ? "text-foreground"
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
               {link.label}
@@ -72,20 +90,20 @@ export function SiteHeader() {
 
         {/* CTA + Mobile Toggle */}
         <div className="flex items-center gap-3">
-          <Button variant="hero" size="sm" className="hidden sm:inline-flex" asChild>
-            <Link to="/contact">Request a Quote</Link>
-          </Button>
-          
+          <GradientButton
+            to="/contact"
+            height="38px"
+            className="hidden sm:inline-flex text-sm"
+          >
+            Request a Quote
+          </GradientButton>
+
           <button
             className="md:hidden p-2 rounded-lg hover:bg-muted transition-colors"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle menu"
           >
-            {isMobileMenuOpen ? (
-              <X className="w-6 h-6" />
-            ) : (
-              <Menu className="w-6 h-6" />
-            )}
+            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
       </nav>
@@ -106,18 +124,19 @@ export function SiteHeader() {
                   key={link.href}
                   to={link.href}
                   className={cn(
-                    "px-4 py-3 rounded-lg text-base font-medium transition-all duration-200",
+                    "px-4 py-3 text-base font-medium transition-colors duration-200 outline-none focus:outline-none focus-visible:outline-none",
                     location.pathname === link.href || location.pathname.startsWith(link.href + "/")
-                      ? "text-primary bg-primary/10"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      ? "text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
                   )}
                 >
                   {link.label}
                 </Link>
-              ))}
-              <Button variant="hero" className="mt-4" asChild>
-                <Link to="/contact">Request a Quote</Link>
-              </Button>
+              ))
+              }
+              <GradientButton to="/contact" className="mt-4">
+                Request a Quote
+              </GradientButton>
             </div>
           </motion.div>
         )}

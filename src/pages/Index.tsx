@@ -1,9 +1,31 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Box, Bot, Cpu, Shield, Zap, FileCheck, BarChart3, MessageSquare, Search, Database, ArrowRightLeft, CheckCircle2, HelpCircle } from "lucide-react";
+import {
+  ArrowRight,
+  Box,
+  Bot,
+  Cpu,
+  Shield,
+  Zap,
+  FileCheck,
+  BarChart3,
+  MessageSquare,
+  Search,
+  Database,
+  ArrowRightLeft,
+  CheckCircle2,
+  HelpCircle,
+} from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
-import { Section, SectionHeader, Reveal, StaggerContainer, StaggerItem } from "@/components/ui/Section";
+import { GradientButton } from "@/components/ui/gradient-button";
+import {
+  Section,
+  SectionHeader,
+  Reveal,
+  StaggerContainer,
+  StaggerItem,
+} from "@/components/ui/Section";
 import { ServiceCard, DemoCard } from "@/components/ui/Cards";
 import { HeroSpline } from "@/components/hero/HeroSpline";
 import {
@@ -45,12 +67,14 @@ const processSteps = [
   {
     step: "01",
     title: "Discover",
-    description: "We analyze your requirements, define success metrics, and scope the project.",
+    description:
+      "We analyze your requirements, define success metrics, and scope the project.",
   },
   {
     step: "02",
     title: "Build",
-    description: "Our team develops production-ready solutions with continuous feedback loops.",
+    description:
+      "Our team develops production-ready solutions with continuous feedback loops.",
   },
   {
     step: "03",
@@ -60,7 +84,8 @@ const processSteps = [
   {
     step: "04",
     title: "Launch & Optimize",
-    description: "Smooth deployment with monitoring, documentation, and ongoing support.",
+    description:
+      "Smooth deployment with monitoring, documentation, and ongoing support.",
   },
 ];
 
@@ -68,7 +93,11 @@ const demos = [
   {
     title: "AR Product Preview",
     description: "Interactive 3D models with AR placement for e-commerce products.",
-    deliverables: ["Web-ready 3D models", "AR viewer integration", "Performance optimization"],
+    deliverables: [
+      "Web-ready 3D models",
+      "AR viewer integration",
+      "Performance optimization",
+    ],
     timeline: "4-6 weeks",
   },
   {
@@ -88,91 +117,84 @@ const demos = [
 const faqs = [
   {
     question: "What are typical project timelines?",
-    answer: "Most projects range from 3-8 weeks depending on complexity. 3D/AR models typically take 4-6 weeks, AI chatbots 3-5 weeks, and complex agent workflows 5-8 weeks. We provide detailed timelines during the discovery phase.",
+    answer:
+      "Most projects range from 3-8 weeks depending on complexity. 3D/AR models typically take 4-6 weeks, AI chatbots 3-5 weeks, and complex agent workflows 5-8 weeks. We provide detailed timelines during the discovery phase.",
   },
   {
     question: "What is the pricing range for your services?",
-    answer: "Projects typically start at $15,000 for focused deliverables. Complex enterprise solutions range from $50,000-$150,000+. We provide detailed quotes based on your specific requirements after an initial consultation.",
+    answer:
+      "Projects typically start at $15,000 for focused deliverables. Complex enterprise solutions range from $50,000-$150,000+. We provide detailed quotes based on your specific requirements after an initial consultation.",
   },
   {
     question: "How do you handle data privacy and security?",
-    answer: "We follow industry best practices including encryption at rest and in transit, secure API integrations, and compliance with GDPR and CCPA where applicable. For AI systems, we implement guardrails and content filtering.",
+    answer:
+      "We follow industry best practices including encryption at rest and in transit, secure API integrations, and compliance with GDPR and CCPA where applicable. For AI systems, we implement guardrails and content filtering.",
   },
   {
     question: "Who owns the final deliverables and code?",
-    answer: "You retain full ownership of all custom code, models, and assets we create for your project. We provide complete documentation and source files upon project completion.",
+    answer:
+      "You retain full ownership of all custom code, models, and assets we create for your project. We provide complete documentation and source files upon project completion.",
   },
   {
     question: "What ongoing support do you offer?",
-    answer: "We offer flexible support packages including bug fixes, model retraining, performance monitoring, and feature updates. Support terms are defined during project scoping.",
+    answer:
+      "We offer flexible support packages including bug fixes, model retraining, performance monitoring, and feature updates. Support terms are defined during project scoping.",
   },
 ];
 
-export default function Index() {
+export default function Services() {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center pt-20">
+      <section className="relative min-h-[calc(100vh-80px)] flex items-center py-12 lg:py-0">
         <div className="container-main">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             {/* Left content */}
-            <div className="relative z-10">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-              >
-                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-6">
-                  <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                  3D • AR • AI
-                </span>
-              </motion.div>
-              
+            <div className="relative z-10 flex flex-col justify-center pt-8 lg:pt-12">
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
+                transition={{ duration: 0.6 }}
                 className="text-display mb-6"
               >
-                Build production-ready{" "}
-                <span className="gradient-text">3D, AR & AI</span>{" "}
-                systems.
+                Build production ready{" "}
+                <span className="gradient-text">3D, AR & AI</span> systems
               </motion.h1>
-              
+
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
                 className="text-body-lg max-w-xl mb-8"
               >
-                HxY Services delivers immersive 3D/AR assets, LangGraph agents, and custom AI chatbots—designed for performance, reliability, and real business outcomes.
+                HYRX delivers immersive 3D/AR assets, LangGraph agents, and
+                custom AI chatbots—designed for performance, reliability, and real
+                business outcomes.
               </motion.p>
-              
+
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                className="flex flex-wrap gap-4"
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="flex flex-wrap items-center gap-4"
               >
-                <Button variant="hero" size="lg" asChild>
-                  <Link to="/contact">
-                    Request a Quote
-                    <ArrowRight className="w-5 h-5" />
-                  </Link>
-                </Button>
+                <GradientButton to="/contact">
+                  Request a Quote
+                  <ArrowRight className="w-5 h-5" />
+                </GradientButton>
                 <Button variant="hero-outline" size="lg" asChild>
                   <Link to="/services">Explore Services</Link>
                 </Button>
               </motion.div>
             </div>
-            
+
             {/* Right - Spline */}
             <div className="relative lg:h-[600px]">
               <HeroSpline />
             </div>
           </div>
         </div>
-        
+
         {/* Background gradient */}
         <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none" />
       </section>
@@ -200,7 +222,7 @@ export default function Index() {
           title="End-to-end solutions for modern digital products"
           description="From immersive 3D experiences to intelligent AI systems, we build technology that delivers measurable results."
         />
-        
+
         <StaggerContainer className="grid md:grid-cols-3 gap-6 lg:gap-8 mt-16">
           {services.map((service) => (
             <StaggerItem key={service.title}>
@@ -220,14 +242,16 @@ export default function Index() {
               description="Our agent workflows include evaluation loops, guardrails, and monitoring—so you can trust the outputs."
               centered={false}
             />
-            
+
             <div className="mt-8 space-y-4">
               <Reveal delay={0.3}>
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-primary mt-0.5 shrink-0" />
                   <div>
                     <span className="font-medium text-foreground">Evaluation-driven</span>
-                    <p className="text-sm text-muted-foreground">Continuous testing ensures quality responses</p>
+                    <p className="text-sm text-muted-foreground">
+                      Continuous testing ensures quality responses
+                    </p>
                   </div>
                 </div>
               </Reveal>
@@ -236,7 +260,9 @@ export default function Index() {
                   <Shield className="w-5 h-5 text-primary mt-0.5 shrink-0" />
                   <div>
                     <span className="font-medium text-foreground">Guardrails & filtering</span>
-                    <p className="text-sm text-muted-foreground">Prevent harmful or off-topic outputs</p>
+                    <p className="text-sm text-muted-foreground">
+                      Prevent harmful or off-topic outputs
+                    </p>
                   </div>
                 </div>
               </Reveal>
@@ -245,18 +271,19 @@ export default function Index() {
                   <BarChart3 className="w-5 h-5 text-primary mt-0.5 shrink-0" />
                   <div>
                     <span className="font-medium text-foreground">Observability</span>
-                    <p className="text-sm text-muted-foreground">Full logging and performance monitoring</p>
+                    <p className="text-sm text-muted-foreground">
+                      Full logging and performance monitoring
+                    </p>
                   </div>
                 </div>
               </Reveal>
             </div>
           </div>
-          
+
           {/* Workflow diagram */}
           <Reveal>
             <div className="relative p-6 sm:p-8 rounded-2xl bg-card border border-border/50">
               <div className="space-y-4">
-                {/* Nodes */}
                 {[
                   { icon: MessageSquare, label: "User Input", color: "primary" },
                   { icon: Search, label: "Retrieval", color: "accent" },
@@ -272,7 +299,13 @@ export default function Index() {
                     transition={{ delay: i * 0.1 }}
                     className="flex items-center gap-4"
                   >
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${node.color === 'primary' ? 'bg-primary/10 text-primary' : 'bg-accent/10 text-accent'}`}>
+                    <div
+                      className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
+                        node.color === "primary"
+                          ? "bg-primary/10 text-primary"
+                          : "bg-accent/10 text-accent"
+                      }`}
+                    >
                       <node.icon className="w-5 h-5" />
                     </div>
                     <div className="flex-1 h-px bg-gradient-to-r from-border to-transparent" />
@@ -280,8 +313,7 @@ export default function Index() {
                   </motion.div>
                 ))}
               </div>
-              
-              {/* Connection line */}
+
               <div className="absolute left-[2.25rem] top-[4.5rem] bottom-[4.5rem] w-px bg-gradient-to-b from-primary/50 via-accent/50 to-primary/50" />
             </div>
           </Reveal>
@@ -295,7 +327,7 @@ export default function Index() {
           title="See what's possible"
           description="Explore representative project examples showing the types of solutions we deliver."
         />
-        
+
         <StaggerContainer className="grid md:grid-cols-3 gap-6 lg:gap-8 mt-16">
           {demos.map((demo) => (
             <StaggerItem key={demo.title}>
@@ -312,13 +344,15 @@ export default function Index() {
           title="From concept to production"
           description="A structured approach that ensures clarity, quality, and on-time delivery."
         />
-        
+
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-16">
           {processSteps.map((step, i) => (
             <Reveal key={step.step} delay={i * 0.1}>
               <div className="relative">
                 <span className="text-6xl font-bold text-muted/30">{step.step}</span>
-                <h3 className="text-xl font-semibold text-foreground mt-2 mb-2">{step.title}</h3>
+                <h3 className="text-xl font-semibold text-foreground mt-2 mb-2">
+                  {step.title}
+                </h3>
                 <p className="text-sm text-muted-foreground">{step.description}</p>
               </div>
             </Reveal>
@@ -333,7 +367,7 @@ export default function Index() {
           title="Common questions"
           description="Answers to the questions we hear most often."
         />
-        
+
         <div className="max-w-3xl mx-auto mt-12">
           <Accordion type="single" collapsible className="space-y-4">
             {faqs.map((faq, i) => (
@@ -360,10 +394,9 @@ export default function Index() {
       {/* Final CTA */}
       <Section>
         <div className="relative p-8 sm:p-12 lg:p-16 rounded-3xl bg-gradient-to-br from-primary/10 via-card to-accent/10 border border-border/50 text-center overflow-hidden">
-          {/* Background effects */}
           <div className="absolute inset-0 bg-grid opacity-20 pointer-events-none" />
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
-          
+
           <div className="relative z-10">
             <Reveal>
               <h2 className="text-headline mb-4">Ready to scope your project?</h2>
@@ -374,13 +407,11 @@ export default function Index() {
               </p>
             </Reveal>
             <Reveal delay={0.2}>
-              <div className="flex flex-wrap justify-center gap-4">
-                <Button variant="hero" size="lg" asChild>
-                  <Link to="/contact">
-                    Request a Quote
-                    <ArrowRight className="w-5 h-5" />
-                  </Link>
-                </Button>
+              <div className="flex flex-wrap justify-center items-center gap-4">
+                <GradientButton to="/contact">
+                  Request a Quote
+                  <ArrowRight className="w-5 h-5" />
+                </GradientButton>
                 <Button variant="hero-outline" size="lg" asChild>
                   <Link to="/contact">Contact Us</Link>
                 </Button>

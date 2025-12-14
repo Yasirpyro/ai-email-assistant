@@ -25,15 +25,20 @@ export function SiteFooter() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
           {/* Brand Column */}
           <div className="lg:col-span-1">
-            <Link to="/" className="flex items-center gap-2 group mb-4">
-              <div className="relative">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center font-bold text-primary-foreground text-lg">
-                  Hx
-                </div>
+            <Link to="/" className="flex items-center gap-3 mb-4">
+              <img
+                src="/brandlogo.png"
+                alt="HYRX Logo"
+                className="w-10 h-10 rounded-lg object-contain"
+              />
+              <div className="flex flex-col">
+                <span className="text-xl font-bold text-foreground leading-tight">
+                  HYRX
+                </span>
+                <span className="text-[10px] font-light text-foreground/70 tracking-[0.2em] uppercase leading-tight">
+                  AI studio
+                </span>
               </div>
-              <span className="text-xl font-bold text-foreground">
-                HxY<span className="text-muted-foreground font-normal"> Services</span>
-              </span>
             </Link>
             <p className="text-body text-sm max-w-xs">
               Production-ready 3D, AR & AI systems. Built for performance, reliability, and real business outcomes.
@@ -110,7 +115,7 @@ export function SiteFooter() {
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-border/50 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} HxY Services. All rights reserved.
+            © {new Date().getFullYear()} HYRX. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             <a
