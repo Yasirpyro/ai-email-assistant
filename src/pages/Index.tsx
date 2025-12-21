@@ -37,15 +37,9 @@ import {
 
 const services = [
   {
-    icon: Box,
-    title: "3D & AR Modelling",
-    description: "Photoreal assets & AR-ready models for modern product experiences.",
-    href: "/services/3d-ar-modelling",
-  },
-  {
     icon: Cpu,
-    title: "LangChain / LangGraph Agents",
-    description: "Automate workflows with tool-use agents and robust eval-driven iterations.",
+    title: "AI Agents & Automations",
+    description: "Automate internal workflows with tool-using agents, guardrails, and evaluation-driven reliability.",
     href: "/services/ai-agents-langgraph",
   },
   {
@@ -53,6 +47,12 @@ const services = [
     title: "Custom AI Chatbots",
     description: "On-site assistants that qualify leads, answer questions, and route requests.",
     href: "/services/custom-ai-chatbots",
+  },
+  {
+    icon: Box,
+    title: "3D & AR Modelling",
+    description: "Photoreal assets & AR-ready models for modern product experiences.",
+    href: "/services/3d-ar-modelling",
   },
 ];
 
@@ -91,6 +91,18 @@ const processSteps = [
 
 const demos = [
   {
+    title: "Support Chatbot",
+    description: "AI-powered customer support with knowledge base integration.",
+    deliverables: ["Custom trained model", "Human handoff system", "Analytics dashboard"],
+    timeline: "3-5 weeks",
+  },
+  {
+    title: "Workflow Automation",
+    description: "Multi-step agent workflow for document processing and analysis.",
+    deliverables: ["Agent pipeline", "Tool integrations", "Evaluation framework"],
+    timeline: "5-8 weeks",
+  },
+  {
     title: "AR Product Preview",
     description: "Interactive 3D models with AR placement for e-commerce products.",
     deliverables: [
@@ -99,18 +111,6 @@ const demos = [
       "Performance optimization",
     ],
     timeline: "4-6 weeks",
-  },
-  {
-    title: "Support Chatbot",
-    description: "AI-powered customer support with knowledge base integration.",
-    deliverables: ["Custom trained model", "Human handoff system", "Analytics dashboard"],
-    timeline: "3-5 weeks",
-  },
-  {
-    title: "LangGraph Automation",
-    description: "Multi-step agent workflow for document processing and analysis.",
-    deliverables: ["Agent pipeline", "Tool integrations", "Evaluation framework"],
-    timeline: "5-8 weeks",
   },
 ];
 
@@ -158,7 +158,7 @@ export default function Services() {
                 className="text-display mb-6"
               >
                 Build production ready{" "}
-                <span className="gradient-text">3D, AR & AI</span> systems
+                <span className="gradient-text">AI agents & automations</span>
               </motion.h1>
 
               <motion.p
@@ -167,9 +167,9 @@ export default function Services() {
                 transition={{ duration: 0.6, delay: 0.1 }}
                 className="text-body-lg max-w-xl mb-10"
               >
-                HYRX delivers immersive 3D/AR assets, LangGraph agents, and
-                custom AI chatbots—designed for performance, reliability, and real
-                business outcomes.
+                HYRX builds production ready AI agents, workflow automations, and
+                customer chat systems designed for reliability, security, and
+                measurable business outcomes.
               </motion.p>
 
               <motion.div
@@ -219,8 +219,8 @@ export default function Services() {
       <Section>
         <SectionHeader
           eyebrow="Our Expertise"
-          title="End-to-end solutions for modern digital products"
-          description="From immersive 3D experiences to intelligent AI systems, we build technology that delivers measurable results."
+          title="End-to-end AI systems for modern teams"
+          description="From strategy to deployment, we build AI agents, automations, and chat experiences that improve speed, quality, and operational efficiency."
         />
 
         <StaggerContainer className="grid md:grid-cols-3 gap-6 lg:gap-8 mt-16">
@@ -239,7 +239,7 @@ export default function Services() {
             <SectionHeader
               eyebrow="How It Works"
               title="Reliable AI agents with built-in safeguards"
-              description="Our agent workflows include evaluation loops, guardrails, and monitoring—so you can trust the outputs."
+              description="Our agent workflows include evaluation loops, guardrails, and monitoring so you can trust the outputs."
               centered={false}
             />
 
@@ -324,8 +324,8 @@ export default function Services() {
       <Section>
         <SectionHeader
           eyebrow="Concept Demos"
-          title="See what's possible"
-          description="Explore representative project examples showing the types of solutions we deliver."
+          title="Applied AI in action"
+          description="Representative examples of agent systems and automations we deliver (with optional immersive experiences when needed)."
         />
 
         <StaggerContainer className="grid md:grid-cols-3 gap-6 lg:gap-8 mt-16">

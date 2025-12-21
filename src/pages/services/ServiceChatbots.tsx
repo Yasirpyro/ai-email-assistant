@@ -233,7 +233,7 @@ export default function ServiceChatbots() {
               Let's discuss your requirements and build a chatbot that works for you.
             </p>
           </Reveal>
-          <Reveal delay={0.2}>
+          <Reveal delay={0.2} className="flex justify-center">
             <GradientButton to="/contact">
               Request a Quote
               <ArrowRight className="w-5 h-5" />

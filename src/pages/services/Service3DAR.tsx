@@ -152,7 +152,7 @@ export default function Service3DAR() {
               Tell us about your project and get a detailed quote.
             </p>
           </Reveal>
-          <Reveal delay={0.2}>
+          <Reveal delay={0.2} className="flex justify-center">
             <GradientButton to="/contact">
               Request a Quote
               <ArrowRight className="w-5 h-5" />

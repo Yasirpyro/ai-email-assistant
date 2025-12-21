@@ -8,14 +8,8 @@ import { ServiceCard } from "@/components/ui/Cards";
 
 const services = [
   {
-    icon: Box,
-    title: "3D & AR Modelling",
-    description: "Photoreal assets & AR-ready models for modern product experiences. Web-optimized and AR-ready deliverables.",
-    href: "/services/3d-ar-modelling",
-  },
-  {
     icon: Cpu,
-    title: "LangChain / LangGraph Agents",
+    title: "AI Agents & Automations",
     description: "Automate complex workflows with intelligent agents, tool integrations, and evaluation frameworks.",
     href: "/services/ai-agents-langgraph",
   },
@@ -24,6 +18,12 @@ const services = [
     title: "Custom AI Chatbots",
     description: "On-site assistants that qualify leads, answer questions, and route requests with human handoff.",
     href: "/services/custom-ai-chatbots",
+  },
+  {
+    icon: Box,
+    title: "3D & AR Modelling",
+    description: "Photoreal assets & AR-ready models for modern product experiences. Web-optimized and AR-ready deliverables.",
+    href: "/services/3d-ar-modelling",
   },
 ];
 
@@ -47,7 +47,7 @@ export default function Services() {
             </Reveal>
             <Reveal delay={0.2}>
               <p className="text-body-lg">
-                From immersive 3D experiences to intelligent AI systems, we build production-ready solutions designed for performance and reliability.
+                From AI agents to workflow automations, we build production-ready solutions designed for reliability, security, and measurable outcomes.
               </p>
             </Reveal>
           </div>
@@ -76,7 +76,7 @@ export default function Services() {
               Let's discuss your project and find the right solution together.
             </p>
           </Reveal>
-          <Reveal delay={0.2}>
+          <Reveal delay={0.2} className="flex justify-center">
             <GradientButton to="/contact">
               Request a Quote
               <ArrowRight className="w-5 h-5" />

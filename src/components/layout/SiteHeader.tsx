@@ -8,14 +8,8 @@ import { cn } from "@/lib/utils";
 
 const serviceLinks = [
   { 
-    href: "/services/3d-ar-modelling", 
-    label: "3D & AR Modelling",
-    description: "Photoreal assets & AR-ready models",
-    icon: Box
-  },
-  { 
     href: "/services/ai-agents-langgraph", 
-    label: "AI Agents (LangGraph)",
+    label: "AI Agents & Automations",
     description: "Automate workflows with tool-use agents",
     icon: Cpu
   },
@@ -24,6 +18,12 @@ const serviceLinks = [
     label: "Custom AI Chatbots",
     description: "On-site assistants that qualify leads",
     icon: Bot
+  },
+  { 
+    href: "/services/3d-ar-modelling", 
+    label: "3D & AR Modelling",
+    description: "Photoreal assets & AR-ready models",
+    icon: Box
   },
 ];
 

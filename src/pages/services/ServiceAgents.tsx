@@ -63,7 +63,7 @@ export default function ServiceAgents() {
                   <Cpu className="w-7 h-7 text-primary" />
                 </div>
                 <span className="text-primary text-sm font-semibold uppercase tracking-wider">
-                  LangChain / LangGraph Agents
+                  AI Agents & automations
                 </span>
               </div>
             </Reveal>
@@ -216,7 +216,7 @@ graph.add_edge("evaluate", "reason")`}
               Let's discuss your automation needs and design a solution.
             </p>
           </Reveal>
-          <Reveal delay={0.2}>
+          <Reveal delay={0.2} className="flex justify-center">
             <GradientButton to="/contact">
               Request a Quote
               <ArrowRight className="w-5 h-5" />

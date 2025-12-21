@@ -21,7 +21,7 @@ const demos = [
   },
   {
     title: "Document Analysis Pipeline",
-    description: "LangGraph workflow for automated document extraction and structured data output.",
+    description: "Automated workflow for document extraction and structured data output.",
     deliverables: ["Multi-format parsing", "Entity extraction", "Validation rules", "API endpoints"],
     timeline: "6-8 weeks",
   },
@@ -94,7 +94,7 @@ export default function Work() {
               Let's discuss how we can bring your vision to life with production-ready solutions.
             </p>
           </Reveal>
-          <Reveal delay={0.2}>
+          <Reveal delay={0.2} className="flex justify-center">
             <GradientButton to="/contact">
               Request a Quote
               <ArrowRight className="w-5 h-5" />

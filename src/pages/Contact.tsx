@@ -11,9 +11,9 @@ import { useToast } from "@/hooks/use-toast";
 import { Mail, MapPin, Send, Loader2 } from "lucide-react";
 
 const services = [
-  { id: "3d-ar", label: "3D & AR Modelling" },
-  { id: "ai-agents", label: "AI Agents (LangGraph)" },
+  { id: "ai-agents", label: "AI Agents & Automations" },
   { id: "chatbots", label: "Custom AI Chatbots" },
+  { id: "3d-ar", label: "3D & AR Modelling" },
 ];
 
 const budgetRanges = [

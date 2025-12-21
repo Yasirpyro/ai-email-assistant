@@ -3,9 +3,9 @@ import { ArrowUpRight } from "lucide-react";
 
 const footerLinks = {
   services: [
-    { label: "3D & AR Modelling", href: "/services/3d-ar-modelling" },
-    { label: "AI Agents (LangGraph)", href: "/services/ai-agents-langgraph" },
+    { label: "AI Agents & Automations", href: "/services/ai-agents-langgraph" },
     { label: "Custom AI Chatbots", href: "/services/custom-ai-chatbots" },
+    { label: "3D & AR Modelling", href: "/services/3d-ar-modelling" },
   ],
   company: [
     { label: "About", href: "/about" },
@@ -41,7 +41,7 @@ export function SiteFooter() {
               </div>
             </Link>
             <p className="text-body text-sm max-w-xs">
-              Production-ready 3D, AR & AI systems. Built for performance, reliability, and real business outcomes.
+              Production ready AI agents & automations. Built for reliability, security, and measurable business outcomes.
             </p>
             <div className="mt-6">
               <a

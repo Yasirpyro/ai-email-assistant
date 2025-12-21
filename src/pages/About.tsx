@@ -42,59 +42,36 @@ export default function About() {
             </Reveal>
             <Reveal delay={0.1}>
               <h1 className="text-display mb-6">
-                Building the future of{" "}
-                <span className="gradient-text">digital experiences</span>
+                Building production AI systems for{" "}
+                <span className="gradient-text">modern teams</span>
               </h1>
             </Reveal>
             <Reveal delay={0.2}>
               <p className="text-body-lg">
-                HYRX is a premium technology studio specializing in 3D/AR experiences and AI systems. We partner with innovative companies worldwide to build production-ready solutions that drive real business outcomes.
+                HYRX is a specialized AI studio that helps teams ship production-ready agents, automations, and chat systems. We partner with ambitious companies to turn high-impact workflows into reliable software—secure, measurable, and built to scale.
               </p>
             </Reveal>
           </div>
         </div>
       </section>
 
-      {/* Story */}
+      {/* Our Approach - Centered */}
       <Section className="bg-card/30 border-y border-border/30">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          <div>
-            <Reveal>
-              <h2 className="text-headline mb-6">Our Approach</h2>
-            </Reveal>
-            <Reveal delay={0.1}>
-              <div className="space-y-4 text-body">
-                <p>
-                  We believe technology should solve real problems, not just demonstrate technical capability. That's why we focus on production-ready solutions with measurable outcomes.
-                </p>
-                <p>
-                  Our team combines deep technical expertise with practical business understanding. We've built 3D experiences for global e-commerce brands, AI agents for enterprise automation, and chatbots that handle thousands of conversations daily.
-                </p>
-                <p>
-                  Every project starts with understanding your goals and constraints. We design solutions that not only work today but scale for tomorrow.
-                </p>
-              </div>
-            </Reveal>
-          </div>
-          
-          <Reveal delay={0.2}>
-            <div className="p-8 rounded-2xl bg-card border border-border/50">
-              <div className="space-y-6">
-                <div>
-                  <span className="text-5xl font-bold gradient-text">50+</span>
-                  <p className="text-muted-foreground mt-2">Projects delivered</p>
-                </div>
-                <div className="h-px bg-border" />
-                <div>
-                  <span className="text-5xl font-bold gradient-text">15+</span>
-                  <p className="text-muted-foreground mt-2">Countries served</p>
-                </div>
-                <div className="h-px bg-border" />
-                <div>
-                  <span className="text-5xl font-bold gradient-text">99%</span>
-                  <p className="text-muted-foreground mt-2">On-time delivery</p>
-                </div>
-              </div>
+        <div className="max-w-3xl mx-auto">
+          <Reveal>
+            <h2 className="text-headline mb-6 text-center">Our Approach</h2>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <div className="space-y-5 text-body">
+              <p>
+                We believe AI should solve real operational problems—not just demo well. That's why we focus on production-grade delivery: clear scope, reliable behavior, and measurable outcomes.
+              </p>
+              <p>
+                Our work combines strong engineering with practical business context. We design agent workflows with guardrails, evaluation, and observability so your team can trust results and iterate safely.
+              </p>
+              <p>
+                Every engagement starts with your goals, constraints, and data reality. From there we build, validate, and deploy—then hand off clean documentation so you can own the system long-term.
+              </p>
             </div>
           </Reveal>
         </div>
