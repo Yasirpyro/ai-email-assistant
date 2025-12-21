@@ -27,7 +27,7 @@ import {
   StaggerItem,
 } from "@/components/ui/Section";
 import { ServiceCard, DemoCard } from "@/components/ui/Cards";
-import { HeroModelViewer } from "@/components/hero/HeroModelViewer";
+import { HeroAgentRunner } from "@/components/hero/HeroAgentRunner";
 import {
   Accordion,
   AccordionContent,
@@ -146,11 +146,11 @@ export default function Services() {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="relative min-h-[calc(100vh-80px)] flex items-center py-12 lg:py-0">
+      <section className="relative min-h-[calc(100vh-80px)] flex items-center py-16 lg:py-20 overflow-hidden">
         <div className="container-main">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
             {/* Left content */}
-            <div className="relative z-10 flex flex-col justify-center pt-8 lg:pt-12">
+            <div className="relative z-10 flex flex-col justify-center">
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -165,7 +165,7 @@ export default function Services() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 }}
-                className="text-body-lg max-w-xl mb-8"
+                className="text-body-lg max-w-xl mb-10"
               >
                 HYRX delivers immersive 3D/AR assets, LangGraph agents, and
                 custom AI chatbots—designed for performance, reliability, and real
@@ -188,9 +188,9 @@ export default function Services() {
               </motion.div>
             </div>
 
-            {/* Right - 3D Model (desktop only) */}
-            <div className="relative lg:h-[600px] hidden md:block">
-              <HeroModelViewer />
+            {/* Right - Agent Runner Card (desktop only) */}
+            <div className="relative hidden lg:flex items-start justify-end">
+              <HeroAgentRunner />
             </div>
           </div>
         </div>
