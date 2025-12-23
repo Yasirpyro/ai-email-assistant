@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Mail, MapPin, Send, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const services = [
   { id: "ai-agents", label: "AI Agents & Automations" },
@@ -49,23 +50,36 @@ export default function Contact() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate form submission (replace with actual API call)
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const { data, error } = await supabase.functions.invoke("send-contact-email", {
+        body: formData,
+      });
 
-    toast({
-      title: "Message sent!",
-      description: "We'll get back to you within 1-2 business days.",
-    });
+      if (error) throw error;
 
-    setFormData({
-      name: "",
-      email: "",
-      company: "",
-      services: [],
-      budget: "",
-      message: "",
-    });
-    setIsSubmitting(false);
+      toast({
+        title: "Message sent!",
+        description: "We'll get back to you within 1-2 business days.",
+      });
+
+      setFormData({
+        name: "",
+        email: "",
+        company: "",
+        services: [],
+        budget: "",
+        message: "",
+      });
+    } catch (error: any) {
+      console.error("Error sending message:", error);
+      toast({
+        title: "Failed to send message",
+        description: "Please try again or email us directly.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
