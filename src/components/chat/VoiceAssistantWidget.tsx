@@ -5,7 +5,6 @@ import {
   X, 
   Send, 
   Mic, 
-  MicOff, 
   Volume2, 
   VolumeX,
   Loader2,
@@ -16,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChatMessage } from "./ChatMessage";
 import { QuickActions } from "./QuickActions";
-import { useSpeech } from "@/hooks/use-speech";
+import { VoiceOrbModal } from "./VoiceOrbModal";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
@@ -40,40 +39,21 @@ export const VoiceAssistantWidget = memo(function VoiceAssistantWidget() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [voiceModalOpen, setVoiceModalOpen] = useState(false);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const prefersReducedMotion = useReducedMotion();
   const isMobile = useIsMobile();
 
-  const handleSpeechResult = useCallback((transcript: string) => {
-    setInputValue(transcript);
-    // Auto-submit after voice input
-    setTimeout(() => {
-      const form = document.getElementById("chat-form") as HTMLFormElement;
-      form?.requestSubmit();
-    }, 100);
-  }, []);
-
-  const handleSpeechError = useCallback((error: string) => {
-    console.error("Speech error:", error);
-    setError("Voice input not available. Please type your message.");
-    setTimeout(() => setError(null), 3000);
-  }, []);
-
-  const {
-    isListening,
-    isSpeaking,
-    isSupported: voiceSupported,
-    isTTSSupported,
-    startListening,
-    stopListening,
-    speak,
-    stopSpeaking,
-  } = useSpeech({
-    onResult: handleSpeechResult,
-    onError: handleSpeechError,
-  });
+  // Check for TTS support
+  const isTTSSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
+  
+  // Check for voice input support
+  const isVoiceSupported = typeof window !== 'undefined' && (
+    'SpeechRecognition' in window || 
+    'webkitSpeechRecognition' in window
+  );
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -88,6 +68,30 @@ export const VoiceAssistantWidget = memo(function VoiceAssistantWidget() {
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [isOpen]);
+
+  const speak = useCallback((text: string) => {
+    if (!window.speechSynthesis || !text || !voiceEnabled) return;
+
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+
+    const voices = window.speechSynthesis.getVoices();
+    const preferredVoice = voices.find(v => 
+      v.name.includes('Google') || 
+      v.name.includes('Samantha') || 
+      v.name.includes('Daniel') ||
+      v.lang.startsWith('en')
+    );
+    if (preferredVoice) {
+      utterance.voice = preferredVoice;
+    }
+
+    window.speechSynthesis.speak(utterance);
+  }, [voiceEnabled]);
 
   const sendMessage = useCallback(async (content: string) => {
     if (!content.trim() || isLoading) return;
@@ -163,19 +167,25 @@ export const VoiceAssistantWidget = memo(function VoiceAssistantWidget() {
   };
 
   const toggleVoice = () => {
-    if (isSpeaking) {
-      stopSpeaking();
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
     }
     setVoiceEnabled(prev => !prev);
   };
 
   const handleMicClick = () => {
-    if (isListening) {
-      stopListening();
-    } else {
-      startListening();
-    }
+    setVoiceModalOpen(true);
   };
+
+  const handleVoiceResult = useCallback((transcript: string) => {
+    sendMessage(transcript);
+  }, [sendMessage]);
+
+  const handleVoiceError = useCallback((error: string) => {
+    console.error("Voice error:", error);
+    setError("Voice input not available. Please type your message.");
+    setTimeout(() => setError(null), 3000);
+  }, []);
 
   const motionProps = prefersReducedMotion
     ? {}
@@ -188,6 +198,14 @@ export const VoiceAssistantWidget = memo(function VoiceAssistantWidget() {
 
   return (
     <>
+      {/* Voice Orb Modal */}
+      <VoiceOrbModal
+        isOpen={voiceModalOpen}
+        onClose={() => setVoiceModalOpen(false)}
+        onResult={handleVoiceResult}
+        onError={handleVoiceError}
+      />
+
       {/* Floating Button */}
       <AnimatePresence>
         {!isOpen && (
@@ -306,31 +324,21 @@ export const VoiceAssistantWidget = memo(function VoiceAssistantWidget() {
                     ref={inputRef}
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
-                    placeholder={isListening ? "Listening..." : "Type a message..."}
-                    className={cn(
-                      "pr-10 bg-muted/30 border-border/50",
-                      isListening && "border-primary animate-pulse"
-                    )}
-                    disabled={isLoading || isListening}
+                    placeholder="Type a message..."
+                    className="pr-10 bg-muted/30 border-border/50"
+                    disabled={isLoading}
                   />
-                  {voiceSupported && (
+                  {isVoiceSupported && (
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className={cn(
-                        "absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7",
-                        isListening && "text-primary"
-                      )}
+                      className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
                       onClick={handleMicClick}
                       disabled={isLoading}
-                      title={isListening ? "Stop listening" : "Voice input"}
+                      title="Voice input"
                     >
-                      {isListening ? (
-                        <MicOff className="w-4 h-4" />
-                      ) : (
-                        <Mic className="w-4 h-4" />
-                      )}
+                      <Mic className="w-4 h-4" />
                     </Button>
                   )}
                 </div>
