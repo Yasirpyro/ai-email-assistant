@@ -59,7 +59,7 @@ const handler = async (req: Request): Promise<Response> => {
       },
       body: JSON.stringify({
         from: "HXY Studio <onboarding@resend.dev>",
-        to: ["hyrx.aistudio@gmail.com"],
+        to: ["yasirpiro1@gmail.com"], // Using verified Resend email for testing - update once domain is verified
         reply_to: email,
         subject: `New Contact Form Submission from ${name}`,
         html: `
