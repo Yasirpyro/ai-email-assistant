@@ -27,7 +27,8 @@ export const VoicePoweredOrb: FC<VoicePoweredOrbProps> = ({
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const microphoneRef = useRef<MediaStreamAudioSourceNode | null>(null);
-  const dataArrayRef = useRef<Uint8Array | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const dataArrayRef = useRef<any>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
 
   const vert = /* glsl */ `
