@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const INTERNAL_EMAIL = "hyrx.aistudio@gmail.com";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -24,12 +25,35 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { name, email, company, services, budget, message }: ContactEmailRequest = await req.json();
+    const body = await req.json();
+    const { name, email, company, services, budget, message }: ContactEmailRequest = body;
+
+    // Basic validation
+    if (!email || !email.includes("@")) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Valid email is required" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    if (!message || message.trim().length === 0) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Message is required" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    if (!name || name.trim().length === 0) {
+      return new Response(
+        JSON.stringify({ success: false, error: "Name is required" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
 
     console.log("Received contact form submission:", { name, email, company, services, budget });
 
     // Format services list
-    const servicesList = services.length > 0 
+    const servicesList = services && services.length > 0 
       ? services.map(s => {
           const labels: Record<string, string> = {
             "ai-agents": "AI Agents & Automations",
@@ -50,7 +74,8 @@ const handler = async (req: Request): Promise<Response> => {
     };
     const budgetLabel = budgetLabels[budget] || budget || "Not specified";
 
-    // Send notification email to the business
+    // Send ONLY internal notification email to verified account
+    // No user confirmation email until domain is verified
     const notificationRes = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -58,76 +83,62 @@ const handler = async (req: Request): Promise<Response> => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "HXY Studio <onboarding@resend.dev>",
-        to: ["yasirpiro1@gmail.com"], // Using verified Resend email for testing - update once domain is verified
-        reply_to: email,
-        subject: `New Contact Form Submission from ${name}`,
+        from: "HYRX Studio <onboarding@resend.dev>",
+        to: [INTERNAL_EMAIL], // Always send to internal email only
+        reply_to: email, // User's email for easy reply from Gmail
+        subject: `New quote request — HYRX`,
         html: `
-          <h1>New Contact Form Submission</h1>
+          <h1>New Quote Request</h1>
+          <hr/>
           <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
           <p><strong>Company:</strong> ${company || "Not provided"}</p>
           <p><strong>Services of Interest:</strong> ${servicesList}</p>
           <p><strong>Budget Range:</strong> ${budgetLabel}</p>
+          <hr/>
           <h2>Message:</h2>
           <p>${message.replace(/\n/g, "<br>")}</p>
+          <hr/>
+          <p style="color: #666; font-size: 12px;">
+            Reply directly to this email to respond to ${name} at ${email}
+          </p>
         `,
       }),
     });
 
     if (!notificationRes.ok) {
-      const error = await notificationRes.text();
-      console.error("Failed to send notification email:", error);
-      throw new Error(`Failed to send notification email: ${error}`);
+      const errorText = await notificationRes.text();
+      console.error("Failed to send internal notification email:", errorText);
+      
+      // Return success:false but NOT a 500 - let frontend handle gracefully
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: "Email delivery issue. Please try again or contact us directly.",
+          fallbackEmail: INTERNAL_EMAIL
+        }),
+        { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
     }
 
-    console.log("Notification email sent successfully");
+    console.log("Internal notification email sent successfully to", INTERNAL_EMAIL);
 
-    // Send confirmation email to the user
-    const confirmationRes = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
-        from: "HXY Studio <onboarding@resend.dev>",
-        to: [email],
-        subject: "We received your message!",
-        html: `
-          <h1>Thank you for contacting us, ${name}!</h1>
-          <p>We have received your message and will get back to you within 1-2 business days.</p>
-          <h2>Your submission:</h2>
-          <p><strong>Services of Interest:</strong> ${servicesList}</p>
-          <p><strong>Budget Range:</strong> ${budgetLabel}</p>
-          <p><strong>Message:</strong></p>
-          <p>${message.replace(/\n/g, "<br>")}</p>
-          <br>
-          <p>Best regards,<br>The HXY Studio Team</p>
-        `,
-      }),
-    });
+    return new Response(
+      JSON.stringify({ success: true }),
+      { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+    );
 
-    if (!confirmationRes.ok) {
-      const error = await confirmationRes.text();
-      console.error("Failed to send confirmation email:", error);
-      // Don't throw here - notification was sent, user confirmation is secondary
-    } else {
-      console.log("Confirmation email sent successfully");
-    }
-
-    return new Response(JSON.stringify({ success: true }), {
-      status: 200,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
-    });
   } catch (error: any) {
     console.error("Error in send-contact-email function:", error);
+    
+    // Return 200 with success:false for graceful frontend handling
     return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
+      JSON.stringify({ 
+        success: false, 
+        error: "Something went wrong. Please email us directly.",
+        fallbackEmail: INTERNAL_EMAIL
+      }),
+      { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }
 };

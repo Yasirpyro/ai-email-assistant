@@ -57,24 +57,40 @@ export default function Contact() {
 
       if (error) throw error;
 
-      toast({
-        title: "Message sent!",
-        description: "We'll get back to you within 1-2 business days.",
-      });
-
-      setFormData({
-        name: "",
-        email: "",
-        company: "",
-        services: [],
-        budget: "",
-        message: "",
-      });
+      // Handle graceful response from edge function
+      if (data?.success) {
+        toast({
+          title: "Message sent!",
+          description: "We'll get back to you within 1-2 business days.",
+        });
+        setFormData({
+          name: "",
+          email: "",
+          company: "",
+          services: [],
+          budget: "",
+          message: "",
+        });
+      } else {
+        // Edge function returned success:false but no 500 error
+        toast({
+          title: "Request received",
+          description: "Thanks! If you don't hear back soon, email us at hyrx.aistudio@gmail.com",
+        });
+        setFormData({
+          name: "",
+          email: "",
+          company: "",
+          services: [],
+          budget: "",
+          message: "",
+        });
+      }
     } catch (error: any) {
       console.error("Error sending message:", error);
       toast({
-        title: "Failed to send message",
-        description: "Please try again or email us directly.",
+        title: "Something went wrong",
+        description: "Please email us directly at hyrx.aistudio@gmail.com",
         variant: "destructive",
       });
     } finally {
