@@ -11,6 +11,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ShinyButton } from "@/components/ui/shiny-button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChatMessage } from "./ChatMessage";
@@ -215,14 +216,10 @@ export const VoiceAssistantWidget = memo(function VoiceAssistantWidget() {
             exit={{ opacity: 0, scale: 0.8 }}
             className="fixed bottom-6 right-6 z-50"
           >
-            <Button
-              onClick={() => setIsOpen(true)}
-              className="group h-14 px-6 rounded-full bg-gradient-to-r from-primary via-primary to-accent text-primary-foreground gap-3 border border-primary/30 shadow-[0_0_30px_-5px_hsl(var(--primary)/0.5)] hover:shadow-[0_0_40px_-5px_hsl(var(--primary)/0.7)] hover:scale-105 transition-all duration-300"
-            >
-              <MessageCircle className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
-              <span className="font-semibold tracking-wide">Talk to HYRX</span>
-              <span className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            </Button>
+            <ShinyButton onClick={() => setIsOpen(true)}>
+              <MessageCircle className="w-5 h-5" />
+              Talk to HYRX
+            </ShinyButton>
           </motion.div>
         )}
       </AnimatePresence>
