@@ -68,6 +68,9 @@ export const VoiceOrbModal = memo(function VoiceOrbModal({
   const [transcript, setTranscript] = useState("");
   const [voiceDetected, setVoiceDetected] = useState(false);
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+  
+  // Detect mobile devices - skip orb's microphone visualization to avoid conflicts
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
   // Initialize speech recognition
   useEffect(() => {
@@ -199,6 +202,7 @@ export const VoiceOrbModal = memo(function VoiceOrbModal({
               maxRotationSpeed={1.5}
               maxHoverIntensity={1.0}
               onVoiceDetected={handleVoiceDetected}
+              skipMicrophoneVisualization={isMobile}
             />
 
             {/* Status text */}

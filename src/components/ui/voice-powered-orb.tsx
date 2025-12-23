@@ -12,6 +12,8 @@ interface VoicePoweredOrbProps {
   maxRotationSpeed?: number;
   maxHoverIntensity?: number;
   onVoiceDetected?: (detected: boolean) => void;
+  /** Skip microphone access for orb visualization (use for mobile where Speech API handles mic) */
+  skipMicrophoneVisualization?: boolean;
 }
 
 export const VoicePoweredOrb: FC<VoicePoweredOrbProps> = ({
@@ -22,6 +24,7 @@ export const VoicePoweredOrb: FC<VoicePoweredOrbProps> = ({
   maxRotationSpeed = 1.2,
   maxHoverIntensity = 0.8,
   onVoiceDetected,
+  skipMicrophoneVisualization = false,
 }) => {
   const ctnDom = useRef<HTMLDivElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -350,7 +353,8 @@ export const VoicePoweredOrb: FC<VoicePoweredOrbProps> = ({
       let voiceLevel = 0;
       const baseRotationSpeed = 0.3;
 
-      if (enableVoiceControl) {
+      // On mobile, skip microphone visualization to avoid conflicts with Speech Recognition API
+      if (enableVoiceControl && !skipMicrophoneVisualization) {
         initMicrophone().then((success) => {
           isMicrophoneInitialized = success;
         });
@@ -368,7 +372,7 @@ export const VoicePoweredOrb: FC<VoicePoweredOrbProps> = ({
         program.uniforms.iTime.value = t * 0.001;
         program.uniforms.hue.value = hue;
 
-        if (enableVoiceControl && isMicrophoneInitialized) {
+        if (enableVoiceControl && isMicrophoneInitialized && !skipMicrophoneVisualization) {
           voiceLevel = analyzeAudio();
 
           if (onVoiceDetected) {
@@ -383,6 +387,13 @@ export const VoicePoweredOrb: FC<VoicePoweredOrbProps> = ({
 
           program.uniforms.hover.value = Math.min(voiceLevel * 2.0, 1.0);
           program.uniforms.hoverIntensity.value = Math.min(voiceLevel * maxHoverIntensity * 0.8, maxHoverIntensity);
+        } else if (enableVoiceControl && skipMicrophoneVisualization) {
+          // Fallback animation for mobile - gentle pulsing animation
+          const pulseSpeed = 1.5;
+          const pulseAmount = 0.3 + Math.sin(t * 0.003 * pulseSpeed) * 0.2;
+          currentRot += dt * baseRotationSpeed;
+          program.uniforms.hover.value = pulseAmount;
+          program.uniforms.hoverIntensity.value = pulseAmount * maxHoverIntensity * 0.5;
         } else {
           program.uniforms.hover.value = 0;
           program.uniforms.hoverIntensity.value = 0;
@@ -437,7 +448,8 @@ export const VoicePoweredOrb: FC<VoicePoweredOrbProps> = ({
     maxHoverIntensity,
     vert,
     frag,
-    onVoiceDetected
+    onVoiceDetected,
+    skipMicrophoneVisualization
   ]);
 
   return (
