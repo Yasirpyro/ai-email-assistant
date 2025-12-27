@@ -16,9 +16,9 @@ export function AgentWorkflowDiagram() {
       
       {/* SVG Diagram */}
       <svg
-        viewBox="0 0 480 280"
+        viewBox="0 0 480 200"
         className="w-full h-auto max-w-[480px] relative z-10"
-        aria-label="Agent workflow diagram showing Input, Retrieve, Reason, Act, Evaluate, and Respond nodes connected in a flow"
+        aria-label="Agent workflow diagram showing Input, Retrieve, Reason, Act, and Respond nodes connected in a flow"
         role="img"
       >
         <defs>
@@ -74,14 +74,6 @@ export function AgentWorkflowDiagram() {
           {/* Act -> Respond (going right then up) */}
           <path d="M 430 140 L 450 140 L 450 60 L 420 60" markerEnd="url(#arrowhead)" />
           
-          {/* Act -> Evaluate */}
-          <line x1="390" y1="165" x2="390" y2="210" markerEnd="url(#arrowhead)" />
-          
-          {/* Evaluate -> Reason (feedback loop) */}
-          <path
-            d="M 350 235 Q 270 280 270 165"
-            markerEnd="url(#arrowhead)"
-          />
         </g>
 
         {/* Nodes */}
@@ -151,18 +143,6 @@ export function AgentWorkflowDiagram() {
             </text>
           </g>
 
-          {/* Evaluate Node */}
-          <g transform="translate(350, 210)">
-            <rect
-              x="0" y="0" width="80" height="50" rx="8"
-              fill="rgba(15, 23, 42, 0.8)"
-              stroke="url(#nodeGradient)"
-              strokeWidth="1.5"
-            />
-            <text x="40" y="30" textAnchor="middle" fill="white" fontSize="11" fontWeight="500">
-              Evaluate
-            </text>
-          </g>
         </g>
 
         {/* Animated pulse dot - only shows when reduced motion is not preferred */}
@@ -190,9 +170,6 @@ export function AgentWorkflowDiagram() {
             </rect>
             <rect x="350" y="115" width="80" height="50" rx="8" fill="none" stroke="rgb(34, 211, 238)">
               <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3s" repeatCount="indefinite" begin="1.5s" />
-            </rect>
-            <rect x="350" y="210" width="80" height="50" rx="8" fill="none" stroke="rgb(34, 211, 238)">
-              <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3s" repeatCount="indefinite" begin="2s" />
             </rect>
             <rect x="340" y="35" width="80" height="50" rx="8" fill="none" stroke="rgb(34, 211, 238)">
               <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3s" repeatCount="indefinite" begin="2.5s" />
