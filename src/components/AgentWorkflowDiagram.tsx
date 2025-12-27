@@ -71,10 +71,8 @@ export function AgentWorkflowDiagram() {
           {/* Reason -> Act */}
           <line x1="310" y1="140" x2="350" y2="140" markerEnd="url(#arrowhead)" />
           
-          {/* Act -> Respond */}
-          <line x1="430" y1="140" x2="440" y2="140" />
-          <line x1="440" y1="140" x2="440" y2="60" />
-          <line x1="440" y1="60" x2="310" y2="60" markerEnd="url(#arrowhead)" />
+          {/* Act -> Respond (going right then up) */}
+          <path d="M 430 140 L 450 140 L 450 60 L 420 60" markerEnd="url(#arrowhead)" />
           
           {/* Act -> Evaluate */}
           <line x1="390" y1="165" x2="390" y2="210" markerEnd="url(#arrowhead)" />
@@ -141,7 +139,7 @@ export function AgentWorkflowDiagram() {
           </g>
 
           {/* Respond Node */}
-          <g transform="translate(260, 35)">
+          <g transform="translate(340, 35)">
             <rect
               x="0" y="0" width="80" height="50" rx="8"
               fill="rgba(15, 23, 42, 0.8)"
@@ -171,9 +169,9 @@ export function AgentWorkflowDiagram() {
         {!prefersReducedMotion && (
           <circle r="4" fill="url(#dotGradient)" filter="url(#glow)">
             <animateMotion
-              dur="4s"
+              dur="5s"
               repeatCount="indefinite"
-              path="M 45 140 L 150 140 L 270 140 L 390 140 L 390 235 Q 310 280 270 140"
+              path="M 45 140 L 150 140 L 270 140 L 390 140 L 450 140 L 450 60 L 380 60"
             />
           </circle>
         )}
@@ -196,7 +194,7 @@ export function AgentWorkflowDiagram() {
             <rect x="350" y="210" width="80" height="50" rx="8" fill="none" stroke="rgb(34, 211, 238)">
               <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3s" repeatCount="indefinite" begin="2s" />
             </rect>
-            <rect x="260" y="35" width="80" height="50" rx="8" fill="none" stroke="rgb(34, 211, 238)">
+            <rect x="340" y="35" width="80" height="50" rx="8" fill="none" stroke="rgb(34, 211, 238)">
               <animate attributeName="opacity" values="0.3;0.6;0.3" dur="3s" repeatCount="indefinite" begin="2.5s" />
             </rect>
           </g>
