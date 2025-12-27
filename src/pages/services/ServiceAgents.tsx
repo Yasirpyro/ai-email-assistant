@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Cpu, Workflow, Shield, BarChart3, Check, Zap, FileSearch, Database, Minus, Plus } from "lucide-react";
+import { ArrowRight, Cpu, Workflow, Shield, BarChart3, Zap, FileSearch, Database, Minus, Plus } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
-import { Button } from "@/components/ui/button";
 import { GradientButton } from "@/components/ui/gradient-button";
 import { Section, SectionHeader, Reveal, StaggerContainer, StaggerItem } from "@/components/ui/Section";
 import { FeatureCard } from "@/components/ui/Cards";
+import { AgentWorkflowDiagram } from "@/components/AgentWorkflowDiagram";
 
 const useCases = [
   {
@@ -247,27 +247,9 @@ export default function ServiceAgents() {
             </div>
           </div>
           
-          <Reveal>
-            <div className="p-6 rounded-2xl bg-card border border-border/50">
-              <pre className="text-sm text-muted-foreground overflow-x-auto">
-{`# Agent Orchestration Structure
-graph = StateGraph(AgentState)
-
-graph.add_node("retrieve", retrieval_node)
-graph.add_node("reason", reasoning_node)
-graph.add_node("act", action_node)
-graph.add_node("evaluate", eval_node)
-
-graph.add_edge("retrieve", "reason")
-graph.add_conditional_edges(
-    "reason",
-    route_decision,
-    {"act": "act", "respond": END}
-)
-graph.add_edge("act", "evaluate")
-graph.add_edge("evaluate", "reason")`}
-              </pre>
-            </div>
+          {/* Agent Workflow Diagram - hidden on mobile for performance */}
+          <Reveal className="hidden md:block">
+            <AgentWorkflowDiagram />
           </Reveal>
         </div>
       </Section>
