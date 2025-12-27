@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import Index from "./pages/Index";
@@ -31,7 +31,8 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/services" element={<Services />} />
             <Route path="/services/3d-ar-modelling" element={<Service3DAR />} />
-            <Route path="/services/ai-agents-langgraph" element={<ServiceAgents />} />
+            <Route path="/services/ai-agents" element={<ServiceAgents />} />
+            <Route path="/services/ai-agents-langgraph" element={<Navigate to="/services/ai-agents" replace />} />
             <Route path="/services/custom-ai-chatbots" element={<ServiceChatbots />} />
             <Route path="/work" element={<Work />} />
             <Route path="/about" element={<About />} />

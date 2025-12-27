@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 
 const serviceLinks = [
   { 
-    href: "/services/ai-agents-langgraph", 
+    href: "/services/ai-agents", 
     label: "AI Agents & Automations",
     description: "Automate workflows with tool-use agents",
     icon: Cpu
@@ -75,7 +75,7 @@ export function SiteHeader() {
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3 cursor-pointer">
           <img
-            src="/brandlogo.png"
+            src="/brandlogo.webp"
             alt="HYRX Logo"
             className="w-10 h-10 rounded-lg object-contain"
           />

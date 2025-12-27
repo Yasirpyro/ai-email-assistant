@@ -1,19 +1,11 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Cpu, Workflow, Shield, BarChart3, Check, Zap, FileSearch, Database } from "lucide-react";
+import { ArrowRight, Cpu, Workflow, Shield, BarChart3, Check, Zap, FileSearch, Database, Minus, Plus } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { GradientButton } from "@/components/ui/gradient-button";
 import { Section, SectionHeader, Reveal, StaggerContainer, StaggerItem } from "@/components/ui/Section";
 import { FeatureCard } from "@/components/ui/Cards";
-
-const deliverables = [
-  "Custom LangGraph agent architecture",
-  "Tool integrations (APIs, databases, services)",
-  "Retrieval-Augmented Generation (RAG) pipeline",
-  "Evaluation framework with test cases",
-  "Guardrails and content filtering",
-  "Observability and logging setup",
-];
 
 const useCases = [
   {
@@ -45,6 +37,136 @@ const process = [
   { step: "04", title: "Deploy & Monitor", description: "Production deployment with observability and feedback loops." },
 ];
 
+function ROICalculatorSection() {
+  const [supportReps, setSupportReps] = useState(1);
+  const [salesResearchers, setSalesResearchers] = useState(1);
+
+  const manualCost = supportReps * 40000 + salesResearchers * 55000;
+  const aiCost = 5000;
+  const savings = Math.max(manualCost - aiCost, 0);
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
+  };
+
+  return (
+    <Section className="bg-card/30 border-y border-border/30">
+      <SectionHeader
+        eyebrow="ROI Calculator"
+        title="How much is manual work costing you?"
+      />
+      
+      <div className="max-w-4xl mx-auto mt-12">
+        <Reveal>
+          <div className="relative rounded-2xl border border-border/50 bg-gradient-to-br from-card via-card to-card/80 p-6 sm:p-8 backdrop-blur-sm overflow-hidden">
+            {/* Subtle gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.03] via-transparent to-primary/[0.02] pointer-events-none" />
+            
+            <div className="relative grid lg:grid-cols-2 gap-8">
+              {/* Left: Pain Points & Inputs */}
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 text-foreground">
+                    <span className="text-primary">→</span>
+                    <span className="text-sm sm:text-base">1 Support Rep = <strong>$40k/year</strong></span>
+                  </div>
+                  <div className="flex items-center gap-3 text-foreground">
+                    <span className="text-primary">→</span>
+                    <span className="text-sm sm:text-base">1 Sales Researcher = <strong>$55k/year</strong></span>
+                  </div>
+                  <div className="flex items-center gap-3 text-foreground">
+                    <span className="text-primary">→</span>
+                    <span className="text-sm sm:text-base">Our AI Agent = <strong>$5k setup + maintenance</strong></span>
+                  </div>
+                  <div className="flex items-center gap-3 text-primary font-medium">
+                    <Zap className="w-4 h-4" />
+                    <span className="text-sm sm:text-base">ROI achieved in &lt; 2 months</span>
+                  </div>
+                </div>
+
+                {/* Mini Calculator Inputs */}
+                <div className="pt-4 border-t border-border/30 space-y-4">
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Estimate Your Savings</p>
+                  
+                  <div className="flex items-center justify-between gap-4">
+                    <label className="text-sm text-muted-foreground">Support Reps</label>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setSupportReps(Math.max(0, supportReps - 1))}
+                        className="w-8 h-8 rounded-lg bg-background/50 border border-border/50 flex items-center justify-center hover:bg-background/80 transition-colors"
+                        aria-label="Decrease support reps"
+                      >
+                        <Minus className="w-4 h-4" />
+                      </button>
+                      <span className="w-8 text-center font-medium tabular-nums">{supportReps}</span>
+                      <button
+                        onClick={() => setSupportReps(Math.min(10, supportReps + 1))}
+                        className="w-8 h-8 rounded-lg bg-background/50 border border-border/50 flex items-center justify-center hover:bg-background/80 transition-colors"
+                        aria-label="Increase support reps"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-4">
+                    <label className="text-sm text-muted-foreground">Sales Researchers</label>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setSalesResearchers(Math.max(0, salesResearchers - 1))}
+                        className="w-8 h-8 rounded-lg bg-background/50 border border-border/50 flex items-center justify-center hover:bg-background/80 transition-colors"
+                        aria-label="Decrease sales researchers"
+                      >
+                        <Minus className="w-4 h-4" />
+                      </button>
+                      <span className="w-8 text-center font-medium tabular-nums">{salesResearchers}</span>
+                      <button
+                        onClick={() => setSalesResearchers(Math.min(10, salesResearchers + 1))}
+                        className="w-8 h-8 rounded-lg bg-background/50 border border-border/50 flex items-center justify-center hover:bg-background/80 transition-colors"
+                        aria-label="Increase sales researchers"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right: Calculated Results */}
+              <div className="flex flex-col justify-center lg:pl-8 lg:border-l border-border/30">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Manual Cost / Year</span>
+                    <span className="text-lg font-semibold text-foreground tabular-nums">{formatCurrency(manualCost)}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">AI Agent Setup</span>
+                    <span className="text-lg font-semibold text-foreground tabular-nums">{formatCurrency(aiCost)}</span>
+                  </div>
+                  <div className="pt-4 border-t border-border/30 flex items-center justify-between">
+                    <span className="text-sm font-medium text-primary">First-Year Savings</span>
+                    <span className="text-2xl font-bold text-primary tabular-nums">{formatCurrency(savings)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Disclaimer */}
+            <p className="mt-8 text-xs text-muted-foreground/70 text-center">
+              Estimates are directional. Final ROI depends on scope, data readiness, and adoption.
+            </p>
+          </div>
+        </Reveal>
+      </div>
+    </Section>
+  );
+}
+
 export default function ServiceAgents() {
   return (
     <Layout>
@@ -75,34 +197,15 @@ export default function ServiceAgents() {
             </Reveal>
             <Reveal delay={0.3}>
               <p className="text-body-lg">
-                We build production-grade AI agents with tool-use capabilities, robust evaluations, and monitoring—designed for reliability and real business impact.
+                We build production-grade AI agents with tool-use capabilities, robust evaluations, and monitoring designed for reliability and real business impact.
               </p>
             </Reveal>
           </div>
         </div>
       </section>
 
-      {/* What You Get */}
-      <Section className="bg-card/30 border-y border-border/30">
-        <SectionHeader
-          eyebrow="Deliverables"
-          title="What you get"
-          description="End-to-end agent solutions ready for production."
-        />
-        
-        <div className="max-w-3xl mx-auto mt-12">
-          <div className="grid sm:grid-cols-2 gap-4">
-            {deliverables.map((item, i) => (
-              <Reveal key={i} delay={i * 0.05}>
-                <div className="flex items-center gap-3 p-4 rounded-xl bg-card border border-border/50">
-                  <Check className="w-5 h-5 text-primary shrink-0" />
-                  <span className="text-sm text-foreground">{item}</span>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </Section>
+      {/* ROI Calculator */}
+      <ROICalculatorSection />
 
       {/* Key Features */}
       <Section>
@@ -147,7 +250,7 @@ export default function ServiceAgents() {
           <Reveal>
             <div className="p-6 rounded-2xl bg-card border border-border/50">
               <pre className="text-sm text-muted-foreground overflow-x-auto">
-{`# LangGraph Agent Structure
+{`# Agent Orchestration Structure
 graph = StateGraph(AgentState)
 
 graph.add_node("retrieve", retrieval_node)

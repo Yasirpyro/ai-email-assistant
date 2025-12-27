@@ -11,7 +11,7 @@ const services = [
     icon: Cpu,
     title: "AI Agents & Automations",
     description: "Automate complex workflows with intelligent agents, tool integrations, and evaluation frameworks.",
-    href: "/services/ai-agents-langgraph",
+    href: "/services/ai-agents",
   },
   {
     icon: Bot,

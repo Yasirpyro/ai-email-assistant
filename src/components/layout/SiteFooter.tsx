@@ -3,7 +3,7 @@ import { ArrowUpRight } from "lucide-react";
 
 const footerLinks = {
   services: [
-    { label: "AI Agents & Automations", href: "/services/ai-agents-langgraph" },
+    { label: "AI Agents & Automations", href: "/services/ai-agents" },
     { label: "Custom AI Chatbots", href: "/services/custom-ai-chatbots" },
     { label: "3D & AR Modelling", href: "/services/3d-ar-modelling" },
   ],
@@ -23,11 +23,10 @@ export function SiteFooter() {
     <footer className="border-t border-border/50 bg-card/30">
       <div className="container-main section-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
-          {/* Brand Column */}
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center gap-3 mb-4">
               <img
-                src="/brandlogo.png"
+                src="/brandlogo.webp"
                 alt="HYRX Logo"
                 className="w-10 h-10 rounded-lg object-contain"
               />
