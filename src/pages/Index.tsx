@@ -349,7 +349,7 @@ export default function Services() {
           {processSteps.map((step, i) => (
             <Reveal key={step.step} delay={i * 0.1}>
               <div className="relative">
-                <span className="text-6xl font-bold text-muted/30">{step.step}</span>
+                <span className="text-6xl font-bold text-foreground/[0.18]">{step.step}</span>
                 <h3 className="text-xl font-semibold text-foreground mt-2 mb-2">
                   {step.title}
                 </h3>

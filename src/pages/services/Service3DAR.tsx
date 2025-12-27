@@ -132,7 +132,7 @@ export default function Service3DAR() {
           {process.map((step, i) => (
             <Reveal key={step.step} delay={i * 0.1}>
               <div>
-                <span className="text-5xl font-bold text-muted-foreground/50">{step.step}</span>
+                <span className="text-5xl font-bold text-foreground/[0.18]">{step.step}</span>
                 <h3 className="text-lg font-semibold text-foreground mt-2 mb-2">{step.title}</h3>
                 <p className="text-sm text-muted-foreground">{step.description}</p>
               </div>
