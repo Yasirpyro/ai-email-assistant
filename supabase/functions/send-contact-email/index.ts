@@ -6,6 +6,16 @@ const RECAPTCHA_SECRET_KEY = Deno.env.get("RECAPTCHA_SECRET_KEY");
 const INTERNAL_EMAIL = "hyrx.aistudio@gmail.com";
 const FROM_EMAIL = "HYRX Studio <hello@hyrx.tech>";
 
+// HTML escape function to prevent injection attacks
+function escapeHtml(unsafe: string): string {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
