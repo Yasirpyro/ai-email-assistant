@@ -52,8 +52,23 @@ export default function Contact() {
     setIsSubmitting(true);
 
     try {
+      // Get reCAPTCHA v3 token
+      const recaptchaToken = await new Promise<string>((resolve, reject) => {
+        const grecaptcha = (window as any).grecaptcha;
+        if (typeof grecaptcha === "undefined") {
+          reject(new Error("reCAPTCHA not loaded"));
+          return;
+        }
+        grecaptcha.ready(() => {
+          grecaptcha
+            .execute("6LfONTwsAAAANWWtBiaTd34TbaP0_Vx7qUf-GiY", { action: "contact_form" })
+            .then(resolve)
+            .catch(reject);
+        });
+      });
+
       const { data, error } = await supabase.functions.invoke("send-contact-email", {
-        body: formData,
+        body: { ...formData, recaptchaToken },
       });
 
       if (error) throw error;
