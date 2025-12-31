@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const INTERNAL_EMAIL = "hyrx.aistudio@gmail.com";
@@ -53,6 +54,33 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Received contact form submission:", { name, email, company, services, budget });
 
+    // Initialize Supabase client with service role for database insert
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Save submission to database
+    const { data: dbData, error: dbError } = await supabase
+      .from("contact_submissions")
+      .insert({
+        name: name.trim(),
+        email: email.trim(),
+        company: company?.trim() || null,
+        services: services || [],
+        budget: budget || null,
+        message: message.trim(),
+        status: "pending",
+      })
+      .select()
+      .single();
+
+    if (dbError) {
+      console.error("Failed to save submission to database:", dbError);
+      // Continue with email sending even if DB insert fails
+    } else {
+      console.log("Submission saved to database with ID:", dbData.id);
+    }
+
     // Format services list
     const servicesList = services && services.length > 0 
       ? services.map(s => {
@@ -60,6 +88,7 @@ const handler = async (req: Request): Promise<Response> => {
             "ai-agents": "AI Agents & Automations",
             "chatbots": "Custom AI Chatbots",
             "3d-ar": "3D & AR Modelling",
+            "other": "Other",
           };
           return labels[s] || s;
         }).join(", ")
@@ -67,10 +96,10 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Format budget
     const budgetLabels: Record<string, string> = {
+      "1k-5k": "$1,000 - $5,000",
+      "5k-15k": "$5,000 - $15,000",
       "15k-30k": "$15,000 - $30,000",
-      "30k-50k": "$30,000 - $50,000",
-      "50k-100k": "$50,000 - $100,000",
-      "100k+": "$100,000+",
+      "50k+": "$50,000+",
       "not-sure": "Not sure yet",
     };
     const budgetLabel = budgetLabels[budget] || budget || "Not specified";
