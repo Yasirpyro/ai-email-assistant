@@ -174,7 +174,7 @@ const handler = async (req: Request): Promise<Response> => {
                     <!-- Content -->
                     <tr>
                       <td style="padding: 40px;">
-                        <h2 style="margin: 0 0 20px; color: #ffffff; font-size: 24px; font-weight: 600;">Thanks for reaching out, ${name}!</h2>
+                        <h2 style="margin: 0 0 20px; color: #ffffff; font-size: 24px; font-weight: 600;">Thanks for reaching out, ${escapeHtml(name)}!</h2>
                         <p style="margin: 0 0 20px; color: #a1a1aa; font-size: 16px; line-height: 1.6;">
                           We've received your project request and our team is excited to review it. We typically respond within 24-48 hours.
                         </p>
@@ -194,7 +194,7 @@ const handler = async (req: Request): Promise<Response> => {
                             ${company ? `
                             <tr>
                               <td style="padding: 8px 0; color: #71717a; font-size: 14px;">Company:</td>
-                              <td style="padding: 8px 0; color: #ffffff; font-size: 14px; text-align: right;">${company}</td>
+                              <td style="padding: 8px 0; color: #ffffff; font-size: 14px; text-align: right;">${escapeHtml(company)}</td>
                             </tr>
                             ` : ''}
                           </table>
@@ -245,7 +245,7 @@ const handler = async (req: Request): Promise<Response> => {
         from: FROM_EMAIL,
         to: [INTERNAL_EMAIL],
         reply_to: email,
-        subject: `New quote request from ${name} — HYRX`,
+        subject: `New quote request from ${escapeHtml(name)} — HYRX`,
         html: `
           <!DOCTYPE html>
           <html>
@@ -260,15 +260,15 @@ const handler = async (req: Request): Promise<Response> => {
               <table width="100%" cellpadding="0" cellspacing="0" style="font-size: 15px;">
                 <tr>
                   <td style="padding: 12px 0; color: #666; width: 120px; vertical-align: top;">Name:</td>
-                  <td style="padding: 12px 0; color: #0a0a0a; font-weight: 500;">${name}</td>
+                  <td style="padding: 12px 0; color: #0a0a0a; font-weight: 500;">${escapeHtml(name)}</td>
                 </tr>
                 <tr>
                   <td style="padding: 12px 0; color: #666; vertical-align: top;">Email:</td>
-                  <td style="padding: 12px 0;"><a href="mailto:${email}" style="color: #0891b2; text-decoration: none;">${email}</a></td>
+                  <td style="padding: 12px 0;"><a href="mailto:${escapeHtml(email)}" style="color: #0891b2; text-decoration: none;">${escapeHtml(email)}</a></td>
                 </tr>
                 <tr>
                   <td style="padding: 12px 0; color: #666; vertical-align: top;">Company:</td>
-                  <td style="padding: 12px 0; color: #0a0a0a;">${company || "Not provided"}</td>
+                  <td style="padding: 12px 0; color: #0a0a0a;">${company ? escapeHtml(company) : "Not provided"}</td>
                 </tr>
                 <tr>
                   <td style="padding: 12px 0; color: #666; vertical-align: top;">Services:</td>
@@ -284,13 +284,13 @@ const handler = async (req: Request): Promise<Response> => {
               
               <h2 style="margin: 0 0 12px; color: #0a0a0a; font-size: 16px;">Message:</h2>
               <div style="background: #f9f9f9; border-radius: 6px; padding: 16px; color: #333; line-height: 1.6;">
-                ${message.replace(/\n/g, "<br>")}
+                ${escapeHtml(message).replace(/\n/g, "<br>")}
               </div>
               
               <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 24px 0;">
               
               <p style="margin: 0; color: #999; font-size: 13px;">
-                Reply directly to this email to respond to ${name}
+                Reply directly to this email to respond to ${escapeHtml(name)}
               </p>
             </div>
           </body>
