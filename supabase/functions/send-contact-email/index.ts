@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const RECAPTCHA_SECRET_KEY = Deno.env.get("RECAPTCHA_SECRET_KEY");
@@ -22,15 +23,16 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-interface ContactEmailRequest {
-  name: string;
-  email: string;
-  company?: string;
-  services: string[];
-  budget: string;
-  message: string;
-  recaptchaToken: string;
-}
+// Input validation schema with strict constraints
+const ContactFormSchema = z.object({
+  name: z.string().min(1, "Name is required").max(100, "Name too long").trim(),
+  email: z.string().email("Invalid email address").max(255, "Email too long"),
+  company: z.string().max(100, "Company name too long").optional().nullable(),
+  services: z.array(z.string().max(50)).max(10, "Too many services").default([]),
+  budget: z.string().max(50, "Budget value too long").optional().nullable().default(""),
+  message: z.string().min(1, "Message is required").max(5000, "Message too long (max 5000 characters)").trim(),
+  recaptchaToken: z.string().min(20, "Invalid reCAPTCHA token").max(2000, "Invalid reCAPTCHA token")
+});
 
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
@@ -40,17 +42,21 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const body = await req.json();
-    const { name, email, company, services, budget, message, recaptchaToken }: ContactEmailRequest = body;
-
-    // Verify reCAPTCHA token
-    if (!recaptchaToken) {
-      console.error("No reCAPTCHA token provided");
+    
+    // Validate input with Zod schema
+    const validationResult = ContactFormSchema.safeParse(body);
+    if (!validationResult.success) {
+      const firstError = validationResult.error.errors[0];
+      console.error("Input validation failed:", validationResult.error.errors);
       return new Response(
-        JSON.stringify({ success: false, error: "reCAPTCHA verification failed" }),
+        JSON.stringify({ success: false, error: firstError?.message || "Invalid input" }),
         { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
+    
+    const { name, email, company, services, budget, message, recaptchaToken } = validationResult.data;
 
+    // Verify reCAPTCHA token
     const recaptchaResponse = await fetch("https://www.google.com/recaptcha/api/siteverify", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -64,28 +70,6 @@ const handler = async (req: Request): Promise<Response> => {
       console.error("reCAPTCHA verification failed:", recaptchaResult);
       return new Response(
         JSON.stringify({ success: false, error: "Spam detection triggered. Please try again." }),
-        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
-    }
-
-    // Basic validation
-    if (!email || !email.includes("@")) {
-      return new Response(
-        JSON.stringify({ success: false, error: "Valid email is required" }),
-        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
-    }
-
-    if (!message || message.trim().length === 0) {
-      return new Response(
-        JSON.stringify({ success: false, error: "Message is required" }),
-        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
-    }
-
-    if (!name || name.trim().length === 0) {
-      return new Response(
-        JSON.stringify({ success: false, error: "Name is required" }),
         { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
@@ -140,7 +124,7 @@ const handler = async (req: Request): Promise<Response> => {
       "50k+": "$50,000+",
       "not-sure": "Not sure yet",
     };
-    const budgetLabel = budgetLabels[budget] || budget || "Not specified";
+    const budgetLabel = budget ? (budgetLabels[budget] || budget) : "Not specified";
 
     // 1. Send user confirmation email
     const userConfirmationRes = await fetch("https://api.resend.com/emails", {
