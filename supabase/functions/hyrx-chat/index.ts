@@ -1,9 +1,20 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Input validation schema for chat messages
+const ChatMessageSchema = z.object({
+  role: z.enum(["user", "assistant", "system"]),
+  content: z.string().min(1, "Message cannot be empty").max(4000, "Message too long")
+});
+
+const ChatRequestSchema = z.object({
+  messages: z.array(ChatMessageSchema).min(1, "At least one message required").max(50, "Too many messages in history")
+});
 
 // HYRX Knowledge Base
 const HYRX_KNOWLEDGE = `
@@ -117,14 +128,20 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
-
-    if (!messages || !Array.isArray(messages)) {
+    const body = await req.json();
+    
+    // Validate input with Zod schema
+    const validationResult = ChatRequestSchema.safeParse(body);
+    if (!validationResult.success) {
+      const firstError = validationResult.error.errors[0];
+      console.error("Input validation failed:", validationResult.error.errors);
       return new Response(
-        JSON.stringify({ error: "Messages array is required" }),
+        JSON.stringify({ error: firstError?.message || "Invalid input" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+    
+    const { messages } = validationResult.data;
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
