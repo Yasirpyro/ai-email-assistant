@@ -15,13 +15,14 @@ const services = [
   { id: "ai-agents", label: "AI Agents & Automations" },
   { id: "chatbots", label: "Custom AI Chatbots" },
   { id: "3d-ar", label: "3D & AR Modelling" },
+  { id: "other", label: "Other" },
 ];
 
 const budgetRanges = [
+  { value: "1k-5k", label: "$1,000 - $5,000" },
+  { value: "5k-15k", label: "$5,000 - $15,000" },
   { value: "15k-30k", label: "$15,000 - $30,000" },
-  { value: "30k-50k", label: "$30,000 - $50,000" },
-  { value: "50k-100k", label: "$50,000 - $100,000" },
-  { value: "100k+", label: "$100,000+" },
+  { value: "50k+", label: "$50,000+" },
   { value: "not-sure", label: "Not sure yet" },
 ];
 
