@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 const INTERNAL_EMAIL = "hyrx.aistudio@gmail.com";
+const FROM_EMAIL = "HYRX Studio <hello@hyrx.tech>";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -74,8 +75,99 @@ const handler = async (req: Request): Promise<Response> => {
     };
     const budgetLabel = budgetLabels[budget] || budget || "Not specified";
 
-    // Send ONLY internal notification email to verified account
-    // No user confirmation email until domain is verified
+    // 1. Send user confirmation email
+    const userConfirmationRes = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${RESEND_API_KEY}`,
+      },
+      body: JSON.stringify({
+        from: FROM_EMAIL,
+        to: [email],
+        subject: "We received your request — HYRX Studio",
+        html: `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          </head>
+          <body style="margin: 0; padding: 0; background-color: #0a0a0a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #0a0a0a; padding: 40px 20px;">
+              <tr>
+                <td align="center">
+                  <table width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; background-color: #111111; border-radius: 12px; overflow: hidden;">
+                    <!-- Header -->
+                    <tr>
+                      <td style="padding: 40px 40px 30px; text-align: center; border-bottom: 1px solid #222;">
+                        <h1 style="margin: 0; color: #22d3ee; font-size: 28px; font-weight: 700;">HYRX Studio</h1>
+                      </td>
+                    </tr>
+                    <!-- Content -->
+                    <tr>
+                      <td style="padding: 40px;">
+                        <h2 style="margin: 0 0 20px; color: #ffffff; font-size: 24px; font-weight: 600;">Thanks for reaching out, ${name}!</h2>
+                        <p style="margin: 0 0 20px; color: #a1a1aa; font-size: 16px; line-height: 1.6;">
+                          We've received your project request and our team is excited to review it. We typically respond within 24-48 hours.
+                        </p>
+                        
+                        <!-- Request Summary -->
+                        <div style="background-color: #1a1a1a; border-radius: 8px; padding: 24px; margin: 24px 0;">
+                          <h3 style="margin: 0 0 16px; color: #22d3ee; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Your Request Summary</h3>
+                          <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                              <td style="padding: 8px 0; color: #71717a; font-size: 14px;">Services:</td>
+                              <td style="padding: 8px 0; color: #ffffff; font-size: 14px; text-align: right;">${servicesList}</td>
+                            </tr>
+                            <tr>
+                              <td style="padding: 8px 0; color: #71717a; font-size: 14px;">Budget Range:</td>
+                              <td style="padding: 8px 0; color: #ffffff; font-size: 14px; text-align: right;">${budgetLabel}</td>
+                            </tr>
+                            ${company ? `
+                            <tr>
+                              <td style="padding: 8px 0; color: #71717a; font-size: 14px;">Company:</td>
+                              <td style="padding: 8px 0; color: #ffffff; font-size: 14px; text-align: right;">${company}</td>
+                            </tr>
+                            ` : ''}
+                          </table>
+                        </div>
+
+                        <p style="margin: 24px 0 0; color: #a1a1aa; font-size: 16px; line-height: 1.6;">
+                          In the meantime, feel free to explore our work at <a href="https://hyrx.tech/work" style="color: #22d3ee; text-decoration: none;">hyrx.tech/work</a>.
+                        </p>
+                      </td>
+                    </tr>
+                    <!-- Footer -->
+                    <tr>
+                      <td style="padding: 30px 40px; background-color: #0a0a0a; border-top: 1px solid #222;">
+                        <p style="margin: 0 0 8px; color: #71717a; font-size: 14px;">Best regards,</p>
+                        <p style="margin: 0 0 16px; color: #ffffff; font-size: 16px; font-weight: 600;">The HYRX Studio Team</p>
+                        <p style="margin: 0; color: #52525b; font-size: 12px;">
+                          <a href="https://hyrx.tech" style="color: #52525b; text-decoration: none;">hyrx.tech</a> · 
+                          <a href="mailto:hello@hyrx.tech" style="color: #52525b; text-decoration: none;">hello@hyrx.tech</a>
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </body>
+          </html>
+        `,
+      }),
+    });
+
+    if (!userConfirmationRes.ok) {
+      const errorText = await userConfirmationRes.text();
+      console.error("Failed to send user confirmation email:", errorText);
+      // Continue to send internal notification even if user email fails
+    } else {
+      console.log("User confirmation email sent successfully to", email);
+    }
+
+    // 2. Send internal notification email
     const notificationRes = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -83,25 +175,59 @@ const handler = async (req: Request): Promise<Response> => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "HYRX Studio <onboarding@resend.dev>",
-        to: [INTERNAL_EMAIL], // Always send to internal email only
-        reply_to: email, // User's email for easy reply from Gmail
-        subject: `New quote request — HYRX`,
+        from: FROM_EMAIL,
+        to: [INTERNAL_EMAIL],
+        reply_to: email,
+        subject: `New quote request from ${name} — HYRX`,
         html: `
-          <h1>New Quote Request</h1>
-          <hr/>
-          <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
-          <p><strong>Company:</strong> ${company || "Not provided"}</p>
-          <p><strong>Services of Interest:</strong> ${servicesList}</p>
-          <p><strong>Budget Range:</strong> ${budgetLabel}</p>
-          <hr/>
-          <h2>Message:</h2>
-          <p>${message.replace(/\n/g, "<br>")}</p>
-          <hr/>
-          <p style="color: #666; font-size: 12px;">
-            Reply directly to this email to respond to ${name} at ${email}
-          </p>
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="utf-8">
+          </head>
+          <body style="margin: 0; padding: 20px; background-color: #f5f5f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+            <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+              <h1 style="margin: 0 0 24px; color: #0a0a0a; font-size: 24px;">New Quote Request</h1>
+              <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 24px 0;">
+              
+              <table width="100%" cellpadding="0" cellspacing="0" style="font-size: 15px;">
+                <tr>
+                  <td style="padding: 12px 0; color: #666; width: 120px; vertical-align: top;">Name:</td>
+                  <td style="padding: 12px 0; color: #0a0a0a; font-weight: 500;">${name}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 12px 0; color: #666; vertical-align: top;">Email:</td>
+                  <td style="padding: 12px 0;"><a href="mailto:${email}" style="color: #0891b2; text-decoration: none;">${email}</a></td>
+                </tr>
+                <tr>
+                  <td style="padding: 12px 0; color: #666; vertical-align: top;">Company:</td>
+                  <td style="padding: 12px 0; color: #0a0a0a;">${company || "Not provided"}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 12px 0; color: #666; vertical-align: top;">Services:</td>
+                  <td style="padding: 12px 0; color: #0a0a0a;">${servicesList}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 12px 0; color: #666; vertical-align: top;">Budget:</td>
+                  <td style="padding: 12px 0; color: #0a0a0a; font-weight: 500;">${budgetLabel}</td>
+                </tr>
+              </table>
+              
+              <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 24px 0;">
+              
+              <h2 style="margin: 0 0 12px; color: #0a0a0a; font-size: 16px;">Message:</h2>
+              <div style="background: #f9f9f9; border-radius: 6px; padding: 16px; color: #333; line-height: 1.6;">
+                ${message.replace(/\n/g, "<br>")}
+              </div>
+              
+              <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 24px 0;">
+              
+              <p style="margin: 0; color: #999; font-size: 13px;">
+                Reply directly to this email to respond to ${name}
+              </p>
+            </div>
+          </body>
+          </html>
         `,
       }),
     });
@@ -110,7 +236,6 @@ const handler = async (req: Request): Promise<Response> => {
       const errorText = await notificationRes.text();
       console.error("Failed to send internal notification email:", errorText);
       
-      // Return success:false but NOT a 500 - let frontend handle gracefully
       return new Response(
         JSON.stringify({ 
           success: false, 
@@ -131,7 +256,6 @@ const handler = async (req: Request): Promise<Response> => {
   } catch (error: any) {
     console.error("Error in send-contact-email function:", error);
     
-    // Return 200 with success:false for graceful frontend handling
     return new Response(
       JSON.stringify({ 
         success: false, 
