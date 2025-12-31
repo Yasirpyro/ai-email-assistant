@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const RECAPTCHA_SECRET_KEY = Deno.env.get("RECAPTCHA_SECRET_KEY");
 const INTERNAL_EMAIL = "hyrx.aistudio@gmail.com";
 const FROM_EMAIL = "HYRX Studio <hello@hyrx.tech>";
 
@@ -18,6 +19,7 @@ interface ContactEmailRequest {
   services: string[];
   budget: string;
   message: string;
+  recaptchaToken: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -28,7 +30,33 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const body = await req.json();
-    const { name, email, company, services, budget, message }: ContactEmailRequest = body;
+    const { name, email, company, services, budget, message, recaptchaToken }: ContactEmailRequest = body;
+
+    // Verify reCAPTCHA token
+    if (!recaptchaToken) {
+      console.error("No reCAPTCHA token provided");
+      return new Response(
+        JSON.stringify({ success: false, error: "reCAPTCHA verification failed" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
+    const recaptchaResponse = await fetch("https://www.google.com/recaptcha/api/siteverify", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `secret=${RECAPTCHA_SECRET_KEY}&response=${recaptchaToken}`,
+    });
+
+    const recaptchaResult = await recaptchaResponse.json();
+    console.log("reCAPTCHA verification result:", recaptchaResult);
+
+    if (!recaptchaResult.success || recaptchaResult.score < 0.5) {
+      console.error("reCAPTCHA verification failed:", recaptchaResult);
+      return new Response(
+        JSON.stringify({ success: false, error: "Spam detection triggered. Please try again." }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
 
     // Basic validation
     if (!email || !email.includes("@")) {
