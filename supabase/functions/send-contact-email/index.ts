@@ -123,8 +123,19 @@ const handler = async (req: Request): Promise<Response> => {
     const { name, email, company, services, budget, message, recaptchaToken } = validationResult.data;
 
     // Verify reCAPTCHA token using Enterprise Assessments API
+    if (!GOOGLE_CLOUD_API_KEY) {
+      console.error("GOOGLE_CLOUD_API_KEY is missing");
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Spam protection is not configured. Please try again later.",
+        }),
+        { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
     const assessmentUrl = `https://recaptchaenterprise.googleapis.com/v1/projects/${GOOGLE_CLOUD_PROJECT_ID}/assessments?key=${GOOGLE_CLOUD_API_KEY}`;
-    
+
     const recaptchaResponse = await fetch(assessmentUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -140,18 +151,32 @@ const handler = async (req: Request): Promise<Response> => {
     const recaptchaResult = await recaptchaResponse.json();
     console.log("reCAPTCHA Enterprise verification result:", JSON.stringify(recaptchaResult));
 
+    if (!recaptchaResponse.ok) {
+      const msg = recaptchaResult?.error?.message || "reCAPTCHA verification failed";
+      console.error("reCAPTCHA Enterprise API error:", recaptchaResponse.status, msg);
+
+      const friendly = msg.toLowerCase().includes("referer")
+        ? "Spam protection misconfigured: your Google Cloud API key is restricted to browser referrers. Set application restriction to 'None' (server-to-server) and keep API restriction to reCAPTCHA Enterprise API."
+        : "Spam protection backend error. Please try again in a few minutes.";
+
+      return new Response(
+        JSON.stringify({ success: false, error: friendly }),
+        { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
     // Check if token is valid and score is acceptable
     const tokenValid = recaptchaResult.tokenProperties?.valid === true;
     const score = recaptchaResult.riskAnalysis?.score ?? 0;
-    
+
     if (!tokenValid || score < 0.5) {
       console.error("reCAPTCHA verification failed:", JSON.stringify(recaptchaResult));
       return new Response(
         JSON.stringify({ success: false, error: "Spam detection triggered. Please try again." }),
-        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
-    
+
     console.log(`reCAPTCHA passed - score: ${score}, action: ${recaptchaResult.tokenProperties?.action}`);
 
     console.log("Received contact form submission:", { name, email, company, services, budget });
