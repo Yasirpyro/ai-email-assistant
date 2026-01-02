@@ -47,25 +47,46 @@ export default function Contact() {
     }));
   };
 
+  const getRecaptchaToken = (action: string) =>
+    new Promise<string>((resolve, reject) => {
+      const grecaptcha = (window as any).grecaptcha;
+
+      if (!grecaptcha || typeof grecaptcha.ready !== "function" || typeof grecaptcha.execute !== "function") {
+        reject(new Error("reCAPTCHA not loaded"));
+        return;
+      }
+
+      const timeout = window.setTimeout(() => {
+        reject(new Error("reCAPTCHA timeout"));
+      }, 8000);
+
+      grecaptcha.ready(() => {
+        try {
+          Promise.resolve(
+            grecaptcha.execute("6LfONTwsAAAANWWtBiaTd34TbaP0_Vx7qUf-GiY", { action })
+          )
+            .then((token: string) => {
+              window.clearTimeout(timeout);
+              resolve(token);
+            })
+            .catch((err: unknown) => {
+              window.clearTimeout(timeout);
+              reject(err);
+            });
+        } catch (err) {
+          window.clearTimeout(timeout);
+          reject(err);
+        }
+      });
+    });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
       // Get reCAPTCHA v3 token
-      const recaptchaToken = await new Promise<string>((resolve, reject) => {
-        const grecaptcha = (window as any).grecaptcha;
-        if (typeof grecaptcha === "undefined") {
-          reject(new Error("reCAPTCHA not loaded"));
-          return;
-        }
-        grecaptcha.ready(() => {
-          grecaptcha
-            .execute("6LfONTwsAAAANWWtBiaTd34TbaP0_Vx7qUf-GiY", { action: "contact_form" })
-            .then(resolve)
-            .catch(reject);
-        });
-      });
+      const recaptchaToken = await getRecaptchaToken("contact_form");
 
       const { data, error } = await supabase.functions.invoke("send-contact-email", {
         body: { ...formData, recaptchaToken },
@@ -103,12 +124,26 @@ export default function Contact() {
         });
       }
     } catch (error: any) {
+      const message = (error?.message || "").toString();
       console.error("Error sending message:", error);
-      toast({
-        title: "Something went wrong",
-        description: "Please email us directly at hyrx.aistudio@gmail.com",
-        variant: "destructive",
-      });
+
+      if (
+        message.toLowerCase().includes("recaptcha") ||
+        message.toLowerCase().includes("invalid site key")
+      ) {
+        toast({
+          title: "Spam protection error",
+          description:
+            "reCAPTCHA is failing on this domain. Add hyrx.tech to the allowed domains for your reCAPTCHA v3 key (or generate a new key), then try again.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Something went wrong",
+          description: "Please email us directly at hyrx.aistudio@gmail.com",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
