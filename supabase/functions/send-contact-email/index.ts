@@ -3,7 +3,9 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const BREVO_API_KEY = Deno.env.get("BREVO_API_KEY");
-const RECAPTCHA_SECRET_KEY = Deno.env.get("RECAPTCHA_SECRET_KEY");
+const GOOGLE_CLOUD_API_KEY = Deno.env.get("GOOGLE_CLOUD_API_KEY");
+const RECAPTCHA_SITE_KEY = "6LfONTwsAAAAANWWtBiaTd34TbaP0_Vx7qUf-GiY";
+const GOOGLE_CLOUD_PROJECT_ID = "ben-jqig"; // From your Google Cloud console
 const FROM_EMAIL = Deno.env.get("FROM_EMAIL") || "no-reply@hyrx.tech";
 const REPLY_TO_EMAIL = Deno.env.get("REPLY_TO_EMAIL") || "contact@hyrx.tech";
 const INTERNAL_NOTIFY_EMAIL = Deno.env.get("INTERNAL_NOTIFY_EMAIL") || "hyrx.aistudio@gmail.com";
@@ -120,23 +122,37 @@ const handler = async (req: Request): Promise<Response> => {
     
     const { name, email, company, services, budget, message, recaptchaToken } = validationResult.data;
 
-    // Verify reCAPTCHA token
-    const recaptchaResponse = await fetch("https://www.google.com/recaptcha/api/siteverify", {
+    // Verify reCAPTCHA token using Enterprise Assessments API
+    const assessmentUrl = `https://recaptchaenterprise.googleapis.com/v1/projects/${GOOGLE_CLOUD_PROJECT_ID}/assessments?key=${GOOGLE_CLOUD_API_KEY}`;
+    
+    const recaptchaResponse = await fetch(assessmentUrl, {
       method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: `secret=${RECAPTCHA_SECRET_KEY}&response=${recaptchaToken}`,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        event: {
+          token: recaptchaToken,
+          siteKey: RECAPTCHA_SITE_KEY,
+          expectedAction: "contact_form",
+        },
+      }),
     });
 
     const recaptchaResult = await recaptchaResponse.json();
-    console.log("reCAPTCHA verification result:", recaptchaResult);
+    console.log("reCAPTCHA Enterprise verification result:", JSON.stringify(recaptchaResult));
 
-    if (!recaptchaResult.success || recaptchaResult.score < 0.5) {
-      console.error("reCAPTCHA verification failed:", recaptchaResult);
+    // Check if token is valid and score is acceptable
+    const tokenValid = recaptchaResult.tokenProperties?.valid === true;
+    const score = recaptchaResult.riskAnalysis?.score ?? 0;
+    
+    if (!tokenValid || score < 0.5) {
+      console.error("reCAPTCHA verification failed:", JSON.stringify(recaptchaResult));
       return new Response(
         JSON.stringify({ success: false, error: "Spam detection triggered. Please try again." }),
         { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
+    
+    console.log(`reCAPTCHA passed - score: ${score}, action: ${recaptchaResult.tokenProperties?.action}`);
 
     console.log("Received contact form submission:", { name, email, company, services, budget });
 
