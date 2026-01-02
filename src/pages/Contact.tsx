@@ -49,9 +49,10 @@ export default function Contact() {
 
   const getRecaptchaToken = (action: string) =>
     new Promise<string>((resolve, reject) => {
-      const grecaptcha = (window as any).grecaptcha;
+      const grecaptchaAny = (window as any).grecaptcha;
+      const api = grecaptchaAny?.enterprise ?? grecaptchaAny;
 
-      if (!grecaptcha || typeof grecaptcha.ready !== "function" || typeof grecaptcha.execute !== "function") {
+      if (!api || typeof api.ready !== "function" || typeof api.execute !== "function") {
         reject(new Error("reCAPTCHA not loaded"));
         return;
       }
@@ -60,11 +61,9 @@ export default function Contact() {
         reject(new Error("reCAPTCHA timeout"));
       }, 8000);
 
-      grecaptcha.ready(() => {
+      api.ready(() => {
         try {
-          Promise.resolve(
-            grecaptcha.execute("6LfONTwsAAAAANWWtBiaTd34TbaP0_Vx7qUf-GiY", { action })
-          )
+          Promise.resolve(api.execute("6LfONTwsAAAAANWWtBiaTd34TbaP0_Vx7qUf-GiY", { action }))
             .then((token: string) => {
               window.clearTimeout(timeout);
               resolve(token);
@@ -94,8 +93,7 @@ export default function Contact() {
 
       if (error) throw error;
 
-      // Handle graceful response from edge function
-      if (data?.success) {
+      if (data?.success === true) {
         toast({
           title: "Message sent!",
           description: "We'll get back to you within 1-2 business days.",
@@ -108,21 +106,23 @@ export default function Contact() {
           budget: "",
           message: "",
         });
-      } else {
-        // Edge function returned success:false but no 500 error
-        toast({
-          title: "Request received",
-          description: "Thanks! If you don't hear back soon, email us at hyrx.aistudio@gmail.com",
-        });
-        setFormData({
-          name: "",
-          email: "",
-          company: "",
-          services: [],
-          budget: "",
-          message: "",
-        });
+        return;
       }
+
+      if (typeof data?.error === "string" && data.error.trim().length > 0) {
+        toast({
+          title: "Couldn't send",
+          description: data.error,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Fallback: request accepted but some non-critical part failed
+      toast({
+        title: "Request received",
+        description: "Thanks! If you don't hear back soon, email us at hyrx.aistudio@gmail.com",
+      });
     } catch (error: any) {
       const message = (error?.message || "").toString();
       console.error("Error sending message:", error);
