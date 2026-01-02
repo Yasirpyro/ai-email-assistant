@@ -63,7 +63,7 @@ export default function Contact() {
       grecaptcha.ready(() => {
         try {
           Promise.resolve(
-            grecaptcha.execute("6LfONTwsAAAANWWtBiaTd34TbaP0_Vx7qUf-GiY", { action })
+            grecaptcha.execute("6LfONTwsAAAAANWWtBiaTd34TbaP0_Vx7qUf-GiY", { action })
           )
             .then((token: string) => {
               window.clearTimeout(timeout);
