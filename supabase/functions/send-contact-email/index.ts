@@ -2,10 +2,11 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
-const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+const BREVO_API_KEY = Deno.env.get("BREVO_API_KEY");
 const RECAPTCHA_SECRET_KEY = Deno.env.get("RECAPTCHA_SECRET_KEY");
-const INTERNAL_EMAIL = "hyrx.aistudio@gmail.com";
-const FROM_EMAIL = "HYRX Studio <hello@hyrx.tech>";
+const FROM_EMAIL = Deno.env.get("FROM_EMAIL") || "no-reply@hyrx.tech";
+const REPLY_TO_EMAIL = Deno.env.get("REPLY_TO_EMAIL") || "contact@hyrx.tech";
+const INTERNAL_NOTIFY_EMAIL = Deno.env.get("INTERNAL_NOTIFY_EMAIL") || "hyrx.aistudio@gmail.com";
 
 // HTML escape function to prevent injection attacks
 function escapeHtml(unsafe: string): string {
@@ -33,6 +34,46 @@ const ContactFormSchema = z.object({
   message: z.string().min(1, "Message is required").max(5000, "Message too long (max 5000 characters)").trim(),
   recaptchaToken: z.string().min(20, "Invalid reCAPTCHA token").max(2000, "Invalid reCAPTCHA token")
 });
+
+// Send email via Brevo SMTP API
+async function sendBrevoEmail(params: {
+  to: { email: string; name?: string }[];
+  from: { email: string; name: string };
+  replyTo?: { email: string };
+  subject: string;
+  htmlContent: string;
+}): Promise<{ success: boolean; error?: string }> {
+  try {
+    const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "api-key": BREVO_API_KEY!,
+      },
+      body: JSON.stringify({
+        sender: params.from,
+        to: params.to,
+        replyTo: params.replyTo,
+        subject: params.subject,
+        htmlContent: params.htmlContent,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Brevo API error:", response.status, errorText);
+      return { success: false, error: errorText };
+    }
+
+    const result = await response.json();
+    console.log("Brevo email sent:", result);
+    return { success: true };
+  } catch (error: any) {
+    console.error("Brevo send error:", error.message);
+    return { success: false, error: error.message };
+  }
+}
 
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
@@ -126,179 +167,162 @@ const handler = async (req: Request): Promise<Response> => {
     };
     const budgetLabel = budget ? (budgetLabels[budget] || budget) : "Not specified";
 
-    // 1. Send user confirmation email
-    const userConfirmationRes = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
-        from: FROM_EMAIL,
-        to: [email],
-        subject: "We received your request — HYRX Studio",
-        html: `
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          </head>
-          <body style="margin: 0; padding: 0; background-color: #0a0a0a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-            <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #0a0a0a; padding: 40px 20px;">
-              <tr>
-                <td align="center">
-                  <table width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; background-color: #111111; border-radius: 12px; overflow: hidden;">
-                    <!-- Header -->
-                    <tr>
-                      <td style="padding: 40px 40px 30px; text-align: center; border-bottom: 1px solid #222;">
-                        <h1 style="margin: 0; color: #22d3ee; font-size: 28px; font-weight: 700;">HYRX Studio</h1>
-                      </td>
-                    </tr>
-                    <!-- Content -->
-                    <tr>
-                      <td style="padding: 40px;">
-                        <h2 style="margin: 0 0 20px; color: #ffffff; font-size: 24px; font-weight: 600;">Thanks for reaching out, ${escapeHtml(name)}!</h2>
-                        <p style="margin: 0 0 20px; color: #a1a1aa; font-size: 16px; line-height: 1.6;">
-                          We've received your project request and our team is excited to review it. We typically respond within 24-48 hours.
-                        </p>
-                        
-                        <!-- Request Summary -->
-                        <div style="background-color: #1a1a1a; border-radius: 8px; padding: 24px; margin: 24px 0;">
-                          <h3 style="margin: 0 0 16px; color: #22d3ee; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Your Request Summary</h3>
-                          <table width="100%" cellpadding="0" cellspacing="0">
-                            <tr>
-                              <td style="padding: 8px 0; color: #71717a; font-size: 14px;">Services:</td>
-                              <td style="padding: 8px 0; color: #ffffff; font-size: 14px; text-align: right;">${servicesList}</td>
-                            </tr>
-                            <tr>
-                              <td style="padding: 8px 0; color: #71717a; font-size: 14px;">Budget Range:</td>
-                              <td style="padding: 8px 0; color: #ffffff; font-size: 14px; text-align: right;">${budgetLabel}</td>
-                            </tr>
-                            ${company ? `
-                            <tr>
-                              <td style="padding: 8px 0; color: #71717a; font-size: 14px;">Company:</td>
-                              <td style="padding: 8px 0; color: #ffffff; font-size: 14px; text-align: right;">${escapeHtml(company)}</td>
-                            </tr>
-                            ` : ''}
-                          </table>
-                        </div>
+    // 1. Send user confirmation email (From no-reply@hyrx.tech, reply-to contact@hyrx.tech)
+    const userConfirmationHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #0a0a0a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #0a0a0a; padding: 40px 20px;">
+          <tr>
+            <td align="center">
+              <table width="600" cellpadding="0" cellspacing="0" style="max-width: 600px; background-color: #111111; border-radius: 12px; overflow: hidden;">
+                <!-- Header -->
+                <tr>
+                  <td style="padding: 40px 40px 30px; text-align: center; border-bottom: 1px solid #222;">
+                    <h1 style="margin: 0; color: #22d3ee; font-size: 28px; font-weight: 700;">HYRX Studio</h1>
+                  </td>
+                </tr>
+                <!-- Content -->
+                <tr>
+                  <td style="padding: 40px;">
+                    <h2 style="margin: 0 0 20px; color: #ffffff; font-size: 24px; font-weight: 600;">Thanks for reaching out, ${escapeHtml(name)}!</h2>
+                    <p style="margin: 0 0 20px; color: #a1a1aa; font-size: 16px; line-height: 1.6;">
+                      We've received your project request and our team is excited to review it. We typically respond within 24-48 hours.
+                    </p>
+                    
+                    <!-- Request Summary -->
+                    <div style="background-color: #1a1a1a; border-radius: 8px; padding: 24px; margin: 24px 0;">
+                      <h3 style="margin: 0 0 16px; color: #22d3ee; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Your Request Summary</h3>
+                      <table width="100%" cellpadding="0" cellspacing="0">
+                        <tr>
+                          <td style="padding: 8px 0; color: #71717a; font-size: 14px;">Services:</td>
+                          <td style="padding: 8px 0; color: #ffffff; font-size: 14px; text-align: right;">${servicesList}</td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 8px 0; color: #71717a; font-size: 14px;">Budget Range:</td>
+                          <td style="padding: 8px 0; color: #ffffff; font-size: 14px; text-align: right;">${budgetLabel}</td>
+                        </tr>
+                        ${company ? `
+                        <tr>
+                          <td style="padding: 8px 0; color: #71717a; font-size: 14px;">Company:</td>
+                          <td style="padding: 8px 0; color: #ffffff; font-size: 14px; text-align: right;">${escapeHtml(company)}</td>
+                        </tr>
+                        ` : ''}
+                      </table>
+                    </div>
 
-                        <p style="margin: 24px 0 0; color: #a1a1aa; font-size: 16px; line-height: 1.6;">
-                          In the meantime, feel free to explore our work at <a href="https://hyrx.tech/work" style="color: #22d3ee; text-decoration: none;">hyrx.tech/work</a>.
-                        </p>
-                      </td>
-                    </tr>
-                    <!-- Footer -->
-                    <tr>
-                      <td style="padding: 30px 40px; background-color: #0a0a0a; border-top: 1px solid #222;">
-                        <p style="margin: 0 0 8px; color: #71717a; font-size: 14px;">Best regards,</p>
-                        <p style="margin: 0 0 16px; color: #ffffff; font-size: 16px; font-weight: 600;">The HYRX Studio Team</p>
-                        <p style="margin: 0; color: #52525b; font-size: 12px;">
-                          <a href="https://hyrx.tech" style="color: #52525b; text-decoration: none;">hyrx.tech</a> · 
-                          <a href="mailto:hello@hyrx.tech" style="color: #52525b; text-decoration: none;">hello@hyrx.tech</a>
-                        </p>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-            </table>
-          </body>
-          </html>
-        `,
-      }),
+                    <p style="margin: 24px 0 0; color: #a1a1aa; font-size: 16px; line-height: 1.6;">
+                      In the meantime, feel free to explore our work at <a href="https://hyrx.tech/work" style="color: #22d3ee; text-decoration: none;">hyrx.tech/work</a>.
+                    </p>
+                  </td>
+                </tr>
+                <!-- Footer -->
+                <tr>
+                  <td style="padding: 30px 40px; background-color: #0a0a0a; border-top: 1px solid #222;">
+                    <p style="margin: 0 0 8px; color: #71717a; font-size: 14px;">Best regards,</p>
+                    <p style="margin: 0 0 16px; color: #ffffff; font-size: 16px; font-weight: 600;">The HYRX Studio Team</p>
+                    <p style="margin: 0; color: #52525b; font-size: 12px;">
+                      <a href="https://hyrx.tech" style="color: #52525b; text-decoration: none;">hyrx.tech</a> · 
+                      <a href="mailto:${REPLY_TO_EMAIL}" style="color: #52525b; text-decoration: none;">${REPLY_TO_EMAIL}</a>
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>
+    `;
+
+    const userEmailResult = await sendBrevoEmail({
+      to: [{ email: email, name: name }],
+      from: { email: FROM_EMAIL, name: "HYRX Studio" },
+      replyTo: { email: REPLY_TO_EMAIL },
+      subject: "We received your request — HYRX Studio",
+      htmlContent: userConfirmationHtml,
     });
 
-    if (!userConfirmationRes.ok) {
-      const errorText = await userConfirmationRes.text();
-      console.error("Failed to send user confirmation email:", errorText);
+    if (!userEmailResult.success) {
+      console.error("Failed to send user confirmation email:", userEmailResult.error);
       // Continue to send internal notification even if user email fails
     } else {
       console.log("User confirmation email sent successfully to", email);
     }
 
-    // 2. Send internal notification email
-    const notificationRes = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
-        from: FROM_EMAIL,
-        to: [INTERNAL_EMAIL],
-        reply_to: email,
-        subject: `New quote request from ${escapeHtml(name)} — HYRX`,
-        html: `
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <meta charset="utf-8">
-          </head>
-          <body style="margin: 0; padding: 20px; background-color: #f5f5f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-            <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-              <h1 style="margin: 0 0 24px; color: #0a0a0a; font-size: 24px;">New Quote Request</h1>
-              <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 24px 0;">
-              
-              <table width="100%" cellpadding="0" cellspacing="0" style="font-size: 15px;">
-                <tr>
-                  <td style="padding: 12px 0; color: #666; width: 120px; vertical-align: top;">Name:</td>
-                  <td style="padding: 12px 0; color: #0a0a0a; font-weight: 500;">${escapeHtml(name)}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 12px 0; color: #666; vertical-align: top;">Email:</td>
-                  <td style="padding: 12px 0;"><a href="mailto:${escapeHtml(email)}" style="color: #0891b2; text-decoration: none;">${escapeHtml(email)}</a></td>
-                </tr>
-                <tr>
-                  <td style="padding: 12px 0; color: #666; vertical-align: top;">Company:</td>
-                  <td style="padding: 12px 0; color: #0a0a0a;">${company ? escapeHtml(company) : "Not provided"}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 12px 0; color: #666; vertical-align: top;">Services:</td>
-                  <td style="padding: 12px 0; color: #0a0a0a;">${servicesList}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 12px 0; color: #666; vertical-align: top;">Budget:</td>
-                  <td style="padding: 12px 0; color: #0a0a0a; font-weight: 500;">${budgetLabel}</td>
-                </tr>
-              </table>
-              
-              <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 24px 0;">
-              
-              <h2 style="margin: 0 0 12px; color: #0a0a0a; font-size: 16px;">Message:</h2>
-              <div style="background: #f9f9f9; border-radius: 6px; padding: 16px; color: #333; line-height: 1.6;">
-                ${escapeHtml(message).replace(/\n/g, "<br>")}
-              </div>
-              
-              <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 24px 0;">
-              
-              <p style="margin: 0; color: #999; font-size: 13px;">
-                Reply directly to this email to respond to ${escapeHtml(name)}
-              </p>
-            </div>
-          </body>
-          </html>
-        `,
-      }),
+    // 2. Send internal notification email (reply-to set to user's email for quick reply)
+    const internalNotificationHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+      </head>
+      <body style="margin: 0; padding: 20px; background-color: #f5f5f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+        <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; padding: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+          <h1 style="margin: 0 0 24px; color: #0a0a0a; font-size: 24px;">New Quote Request</h1>
+          <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 24px 0;">
+          
+          <table width="100%" cellpadding="0" cellspacing="0" style="font-size: 15px;">
+            <tr>
+              <td style="padding: 12px 0; color: #666; width: 120px; vertical-align: top;">Name:</td>
+              <td style="padding: 12px 0; color: #0a0a0a; font-weight: 500;">${escapeHtml(name)}</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px 0; color: #666; vertical-align: top;">Email:</td>
+              <td style="padding: 12px 0;"><a href="mailto:${escapeHtml(email)}" style="color: #0891b2; text-decoration: none;">${escapeHtml(email)}</a></td>
+            </tr>
+            <tr>
+              <td style="padding: 12px 0; color: #666; vertical-align: top;">Company:</td>
+              <td style="padding: 12px 0; color: #0a0a0a;">${company ? escapeHtml(company) : "Not provided"}</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px 0; color: #666; vertical-align: top;">Services:</td>
+              <td style="padding: 12px 0; color: #0a0a0a;">${servicesList}</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px 0; color: #666; vertical-align: top;">Budget:</td>
+              <td style="padding: 12px 0; color: #0a0a0a; font-weight: 500;">${budgetLabel}</td>
+            </tr>
+          </table>
+          
+          <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 24px 0;">
+          
+          <h2 style="margin: 0 0 12px; color: #0a0a0a; font-size: 16px;">Message:</h2>
+          <div style="background: #f9f9f9; border-radius: 6px; padding: 16px; color: #333; line-height: 1.6;">
+            ${escapeHtml(message).replace(/\n/g, "<br>")}
+          </div>
+          
+          <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 24px 0;">
+          
+          <p style="margin: 0; color: #999; font-size: 13px;">
+            Reply directly to this email to respond to ${escapeHtml(name)}
+          </p>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const internalEmailResult = await sendBrevoEmail({
+      to: [{ email: INTERNAL_NOTIFY_EMAIL }],
+      from: { email: FROM_EMAIL, name: "HYRX Website" },
+      replyTo: { email: email }, // Reply goes directly to the user
+      subject: `New quote request from ${name} — HYRX`,
+      htmlContent: internalNotificationHtml,
     });
 
-    if (!notificationRes.ok) {
-      const errorText = await notificationRes.text();
-      console.error("Failed to send internal notification email:", errorText);
-      
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: "Email delivery issue. Please try again or contact us directly.",
-          fallbackEmail: INTERNAL_EMAIL
-        }),
-        { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
+    if (!internalEmailResult.success) {
+      console.error("Failed to send internal notification email:", internalEmailResult.error);
+      // Return success anyway - DB has the submission, user got confirmation
+      // Don't fail the UI for internal email issues
+    } else {
+      console.log("Internal notification email sent successfully to", INTERNAL_NOTIFY_EMAIL);
     }
 
-    console.log("Internal notification email sent successfully to", INTERNAL_EMAIL);
-
+    // Always return success if we got this far - submission is saved
     return new Response(
       JSON.stringify({ success: true }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
@@ -310,8 +334,7 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: "Something went wrong. Please email us directly.",
-        fallbackEmail: INTERNAL_EMAIL
+        error: "Something went wrong. Please email us directly at contact@hyrx.tech",
       }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
