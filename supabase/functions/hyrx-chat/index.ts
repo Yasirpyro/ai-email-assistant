@@ -69,7 +69,7 @@ HYRX is an AI studio specializing in end-to-end AI systems for businesses. We bu
 ## Contact Information
 - Website: Contact page at /contact
 - Request a Quote: Available on the website
-- Email: hyrx.aistudio@gmail.com (backup)
+- Email: contact@hyrx.tech
 
 ## Important Boundaries
 - We do NOT provide legal, medical, or financial advice
@@ -107,7 +107,7 @@ If asked about topics unrelated to HYRX services (celebrity news, politics, pers
 1. Politely acknowledge you can't help with that topic
 2. Explain what you CAN help with (HYRX services, process, quoting)
 3. Offer to help them explore our services or request a quote
-4. Provide the email fallback: hyrx.aistudio@gmail.com
+4. Provide the email fallback: contact@hyrx.tech
 
 Example response for out-of-scope:
 "I'm focused on helping with HYRX's AI services and can't assist with that topic. I can help you:
@@ -120,7 +120,7 @@ Would you like to explore our services, or shall I help you request a quote?"
 When appropriate, guide users to:
 - Visit the Contact page for inquiries
 - Use the Request a Quote form for project discussions
-- Email hyrx.aistudio@gmail.com as a backup
+- Email contact@hyrx.tech as a backup
 
 ### Safety
 - Never request sensitive personal data (SSN, passwords, financial details)
@@ -200,7 +200,7 @@ serve(async (req) => {
       }
       if (response.status === 402) {
         return new Response(
-          JSON.stringify({ error: "AI service temporarily unavailable. Please contact us directly at hyrx.aistudio@gmail.com" }),
+          JSON.stringify({ error: "AI service temporarily unavailable. Please contact us directly at contact@hyrx.tech" }),
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -233,7 +233,7 @@ serve(async (req) => {
     console.error("Chat function error:", error);
     return new Response(
       JSON.stringify({ 
-        error: "Something went wrong. Please try again or contact us at hyrx.aistudio@gmail.com" 
+        error: "Something went wrong. Please try again or contact us at contact@hyrx.tech" 
       }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

@@ -8,7 +8,7 @@ const RECAPTCHA_SITE_KEY = "6LfONTwsAAAAANWWtBiaTd34TbaP0_Vx7qUf-GiY";
 const GOOGLE_CLOUD_PROJECT_ID = "ben-jqig"; // From your Google Cloud console
 const FROM_EMAIL = Deno.env.get("FROM_EMAIL") || "no-reply@hyrx.tech";
 const REPLY_TO_EMAIL = Deno.env.get("REPLY_TO_EMAIL") || "contact@hyrx.tech";
-const INTERNAL_NOTIFY_EMAIL = Deno.env.get("INTERNAL_NOTIFY_EMAIL") || "hyrx.aistudio@gmail.com";
+const INTERNAL_NOTIFY_EMAIL = Deno.env.get("INTERNAL_NOTIFY_EMAIL") || "contact@hyrx.tech";
 
 // HTML escape function to prevent injection attacks
 function escapeHtml(unsafe: string): string {
