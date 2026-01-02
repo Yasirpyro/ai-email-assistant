@@ -4,6 +4,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hide reCAPTCHA badge */
+.grecaptcha-badge {
+  visibility: hidden !important;
+}
+
 /* Lenis smooth scroll base styles */
 html.lenis,
 html.lenis body {
