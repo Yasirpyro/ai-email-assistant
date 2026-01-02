@@ -18,7 +18,7 @@ function escapeHtml(unsafe: string): string {
     .replace(/'/g, "&#039;");
 }
 
-// Allowed origins for CORS - restrict to production and development
+// Allowed origins for CORS - restrict to production, development, and preview
 const ALLOWED_ORIGINS = [
   "https://hyrx.tech",
   "https://www.hyrx.tech",
@@ -26,9 +26,18 @@ const ALLOWED_ORIGINS = [
   "http://localhost:8080",
 ];
 
+// Check if origin is allowed (includes Lovable preview domains)
+function isAllowedOrigin(origin: string | null): boolean {
+  if (!origin) return false;
+  if (ALLOWED_ORIGINS.includes(origin)) return true;
+  // Allow Lovable preview domains
+  if (origin.endsWith('.lovable.app') || origin.endsWith('.lovableproject.com')) return true;
+  return false;
+}
+
 // Get CORS headers with origin validation
 const getCorsHeaders = (origin: string | null): Record<string, string> => {
-  const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  const allowedOrigin = isAllowedOrigin(origin) ? origin! : ALLOWED_ORIGINS[0];
   return {
     "Access-Control-Allow-Origin": allowedOrigin,
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
