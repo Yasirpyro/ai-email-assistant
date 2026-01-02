@@ -154,7 +154,7 @@ export const VoiceAssistantWidget = memo(function VoiceAssistantWidget() {
       const fallbackMessage: Message = {
         id: `assistant-error-${Date.now()}`,
         role: "assistant",
-        content: "I'm having trouble connecting right now. You can reach us directly at hyrx.aistudio@gmail.com or visit our Contact page.",
+        content: "I'm having trouble connecting right now. You can reach us directly at contact@hyrx.tech or visit our Contact page.",
       };
       setMessages(prev => [...prev, fallbackMessage]);
     } finally {

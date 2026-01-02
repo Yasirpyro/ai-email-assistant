@@ -121,7 +121,7 @@ export default function Contact() {
       // Fallback: request accepted but some non-critical part failed
       toast({
         title: "Request received",
-        description: "Thanks! If you don't hear back soon, email us at hyrx.aistudio@gmail.com",
+        description: "Thanks! If you don't hear back soon, email us at contact@hyrx.tech",
       });
     } catch (error: any) {
       const message = (error?.message || "").toString();
@@ -140,7 +140,7 @@ export default function Contact() {
       } else {
         toast({
           title: "Something went wrong",
-          description: "Please email us directly at hyrx.aistudio@gmail.com",
+          description: "Please email us directly at contact@hyrx.tech",
           variant: "destructive",
         });
       }
@@ -192,8 +192,8 @@ export default function Contact() {
                   </div>
                   <div>
                     <h3 className="font-medium text-foreground mb-1">Email</h3>
-                    <a href="mailto:hyrx.aistudio@gmail.com" className="text-muted-foreground hover:text-primary transition-colors">
-                      hyrx.aistudio@gmail.com
+                    <a href="mailto:contact@hyrx.tech" className="text-muted-foreground hover:text-primary transition-colors">
+                      contact@hyrx.tech
                     </a>
                   </div>
                 </div>
