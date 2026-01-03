@@ -25,22 +25,17 @@ export function SiteFooter() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center gap-3 mb-4">
-              <img
-                src="/brandlogo.webp"
-                alt="HYRX Logo"
-                className="w-10 h-10 rounded-lg object-contain"
-              />
+              <img src="/brandlogo.webp" alt="HYRX Logo" className="w-10 h-10 rounded-lg object-contain" />
               <div className="flex flex-col">
-                <span className="text-xl font-bold text-foreground leading-tight">
-                  HYRX
-                </span>
+                <span className="text-xl font-bold text-foreground leading-tight">HYRX</span>
                 <span className="text-[10px] font-light text-foreground/70 tracking-[0.2em] uppercase leading-tight">
                   AI studio
                 </span>
               </div>
             </Link>
             <p className="text-body text-sm max-w-xs">
-              Production ready AI agents & automations. Built for reliability, security, and measurable business outcomes.
+              Production ready AI agents & automations. Built for reliability, security, and measurable business
+              outcomes.
             </p>
             <div className="mt-6">
               <a
@@ -55,9 +50,7 @@ export function SiteFooter() {
 
           {/* Services */}
           <div>
-            <h4 className="text-sm font-semibold text-foreground mb-4 uppercase tracking-wider">
-              Services
-            </h4>
+            <h4 className="text-sm font-semibold text-foreground mb-4 uppercase tracking-wider">Services</h4>
             <ul className="space-y-3">
               {footerLinks.services.map((link) => (
                 <li key={link.href}>
@@ -74,9 +67,7 @@ export function SiteFooter() {
 
           {/* Company */}
           <div>
-            <h4 className="text-sm font-semibold text-foreground mb-4 uppercase tracking-wider">
-              Company
-            </h4>
+            <h4 className="text-sm font-semibold text-foreground mb-4 uppercase tracking-wider">Company</h4>
             <ul className="space-y-3">
               {footerLinks.company.map((link) => (
                 <li key={link.href}>
@@ -93,9 +84,7 @@ export function SiteFooter() {
 
           {/* Legal */}
           <div>
-            <h4 className="text-sm font-semibold text-foreground mb-4 uppercase tracking-wider">
-              Legal
-            </h4>
+            <h4 className="text-sm font-semibold text-foreground mb-4 uppercase tracking-wider">Legal</h4>
             <ul className="space-y-3">
               {footerLinks.legal.map((link) => (
                 <li key={link.href}>
@@ -113,12 +102,10 @@ export function SiteFooter() {
 
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-border/50 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} HYRX. All rights reserved.
-          </p>
+          <p className="text-muted-foreground text-sm">© {new Date().getFullYear()} HYRX. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <a
-              href="https://twitter.com"
+              href="https://x.com/HyrxAistudio"
               target="_blank"
               rel="noopener noreferrer"
               className="text-muted-foreground hover:text-foreground transition-colors text-sm"
@@ -126,7 +113,7 @@ export function SiteFooter() {
               Twitter
             </a>
             <a
-              href="https://linkedin.com"
+              href="https://www.linkedin.com/in/hyrx-ai-studio/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-muted-foreground hover:text-foreground transition-colors text-sm"
@@ -134,12 +121,12 @@ export function SiteFooter() {
               LinkedIn
             </a>
             <a
-              href="https://github.com"
+              href="https://www.instagram.com/hyrx.aistudio/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-muted-foreground hover:text-foreground transition-colors text-sm"
             >
-              GitHub
+              Instagram
             </a>
           </div>
         </div>
