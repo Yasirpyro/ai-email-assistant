@@ -19,6 +19,7 @@ import { QuickActions } from "./QuickActions";
 import { VoiceOrbModal } from "./VoiceOrbModal";
 import { useReducedMotion } from "@/hooks/use-reduced-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useFooterCollision } from "@/hooks/use-footer-collision";
 import { cn } from "@/lib/utils";
 
 interface Message {
@@ -46,6 +47,7 @@ export const VoiceAssistantWidget = memo(function VoiceAssistantWidget() {
   const inputRef = useRef<HTMLInputElement>(null);
   const prefersReducedMotion = useReducedMotion();
   const isMobile = useIsMobile();
+  const { liftAmount } = useFooterCollision();
 
   // Check for TTS support
   const isTTSSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
@@ -214,9 +216,14 @@ export const VoiceAssistantWidget = memo(function VoiceAssistantWidget() {
             initial={prefersReducedMotion ? {} : { opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            className="fixed bottom-6 right-6 z-50"
+            className="fixed right-6 z-50"
+            style={{
+              bottom: `calc(24px + env(safe-area-inset-bottom, 0px))`,
+              transform: liftAmount > 0 ? `translateY(-${liftAmount}px)` : undefined,
+              transition: prefersReducedMotion ? "none" : "transform 0.2s ease-out",
+            }}
           >
-            <ShinyButton onClick={() => setIsOpen(true)}>
+            <ShinyButton onClick={() => setIsOpen(true)} aria-label="Talk to HYRX">
               <MessageCircle className="w-5 h-5" />
               Talk to HYRX
             </ShinyButton>

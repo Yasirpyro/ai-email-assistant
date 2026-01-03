@@ -20,7 +20,7 @@ const footerLinks = {
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-border/50 bg-card/30">
+    <footer id="site-footer" className="border-t border-border/50 bg-card/30">
       <div className="container-main section-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
           <div className="lg:col-span-1">
