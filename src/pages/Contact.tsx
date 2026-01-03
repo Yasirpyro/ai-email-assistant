@@ -317,7 +317,7 @@ export default function Contact() {
                   />
                 </div>
 
-                <Button type="submit" variant="hero" size="lg" disabled={isSubmitting} className="w-full sm:w-auto">
+                <Button type="submit" size="lg" disabled={isSubmitting} className="w-full sm:w-auto">
                   {isSubmitting ? (
                     <>
                       <Loader2 className="w-5 h-5 animate-spin" />
