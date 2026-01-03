@@ -21,7 +21,7 @@ export function Layout({ children }: LayoutProps) {
       <div className="fixed inset-0 bg-gradient-to-b from-primary/5 via-transparent to-accent/5 pointer-events-none" />
       
       <SiteHeader />
-      <main className="flex-1 relative">{children}</main>
+      <main className="flex-1 relative pb-[72px]">{children}</main>
       <SiteFooter />
       
       {/* Voice Assistant Widget - Lazy loaded */}
