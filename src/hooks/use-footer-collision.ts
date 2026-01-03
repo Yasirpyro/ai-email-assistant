@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 
-const BUTTON_HEIGHT = 56; // Approximate height of the floating button
+const BUTTON_HEIGHT = 56; // Fallback height
 const BUTTON_MARGIN = 24; // Bottom margin (bottom-6 = 24px)
 const LIFT_PADDING = 16; // Extra padding when lifting
 
@@ -15,19 +15,23 @@ export function useFooterCollision() {
 
     const footerRect = footer.getBoundingClientRect();
     const viewportHeight = window.innerHeight;
-    
-    // Get safe area inset
-    const safeAreaInset = parseInt(
-      getComputedStyle(document.documentElement).getPropertyValue("--safe-area-inset-bottom") || "0"
-    );
-    
+
+    // Safe area inset (optional, default to 0)
+    const rawInset = getComputedStyle(document.documentElement)
+      .getPropertyValue("--safe-area-inset-bottom")
+      .trim();
+    const parsedInset = Number.parseInt(rawInset || "0", 10);
+    const safeAreaInset = Number.isFinite(parsedInset) ? parsedInset : 0;
+
+    const buttonHeight = buttonRef.current?.offsetHeight ?? BUTTON_HEIGHT;
+
     // Calculate button's bottom position (from viewport bottom)
     const buttonBottom = BUTTON_MARGIN + safeAreaInset;
-    const buttonTop = viewportHeight - buttonBottom - BUTTON_HEIGHT;
-    
-    // Calculate overlap
-    const overlap = buttonTop + BUTTON_HEIGHT - footerRect.top;
-    
+    const buttonTop = viewportHeight - buttonBottom - buttonHeight;
+
+    // Calculate overlap between the button area and footer top
+    const overlap = buttonTop + buttonHeight - footerRect.top;
+
     if (overlap > 0) {
       setLiftAmount(overlap + LIFT_PADDING);
     } else {
@@ -88,3 +92,4 @@ export function useFooterCollision() {
 
   return { liftAmount, buttonRef };
 }
+

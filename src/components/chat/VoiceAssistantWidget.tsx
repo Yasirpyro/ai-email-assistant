@@ -42,12 +42,19 @@ export const VoiceAssistantWidget = memo(function VoiceAssistantWidget() {
   const [error, setError] = useState<string | null>(null);
   const [voiceEnabled, setVoiceEnabled] = useState(true);
   const [voiceModalOpen, setVoiceModalOpen] = useState(false);
+  const [isCtaDismissed, setIsCtaDismissed] = useState(() => {
+    try {
+      return sessionStorage.getItem("hyrx_voice_cta_dismissed") === "1";
+    } catch {
+      return false;
+    }
+  });
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const prefersReducedMotion = useReducedMotion();
   const isMobile = useIsMobile();
-  const { liftAmount } = useFooterCollision();
+  const { liftAmount, buttonRef } = useFooterCollision();
 
   // Check for TTS support
   const isTTSSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
@@ -211,8 +218,9 @@ export const VoiceAssistantWidget = memo(function VoiceAssistantWidget() {
 
       {/* Floating Button */}
       <AnimatePresence>
-        {!isOpen && (
+        {!isOpen && !isCtaDismissed && (
           <motion.div
+            ref={buttonRef}
             initial={prefersReducedMotion ? {} : { opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
@@ -223,10 +231,32 @@ export const VoiceAssistantWidget = memo(function VoiceAssistantWidget() {
               transition: prefersReducedMotion ? "none" : "transform 0.2s ease-out",
             }}
           >
-            <ShinyButton onClick={() => setIsOpen(true)} aria-label="Talk to HYRX">
-              <MessageCircle className="w-5 h-5" />
-              Talk to HYRX
-            </ShinyButton>
+            <div className="relative">
+              <ShinyButton onClick={() => setIsOpen(true)} aria-label="Talk to HYRX">
+                <MessageCircle className="w-5 h-5" />
+                Talk to HYRX
+              </ShinyButton>
+
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="absolute -top-2 -right-2 h-7 w-7 rounded-full border border-border/50 bg-background/90 backdrop-blur"
+                aria-label="Hide Talk to HYRX"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsCtaDismissed(true);
+                  try {
+                    sessionStorage.setItem("hyrx_voice_cta_dismissed", "1");
+                  } catch {
+                    // ignore
+                  }
+                }}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
